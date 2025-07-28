@@ -1,0 +1,7 @@
+@use "./base/variables" as *;
+@use "./base/base" as *;
+@use "./base/resets" as *;
+@use './pages/home' as *;
+@use "./components/layout/header" as *;
+@use "./components/layout/footer" as *;
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
