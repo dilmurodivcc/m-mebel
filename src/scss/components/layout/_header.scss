@@ -1,1 +1,46 @@
 @use "../../base/variables" as *;
+.header {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0 auto;
+  width: 95vw;
+  max-width: 1500px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  margin: 20px 0;
+  border-radius: 30px;
+  height: 60px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+  background-color: var(--bg);
+  z-index: 1000;
+  nav {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    ul {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+    }
+    a {
+      color: var(--text);
+    }
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    font-family: var(--font-secondary);
+    font-size: 1.5rem;
+    color: var(--text-tertiary);
+  }
+  .btn-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}

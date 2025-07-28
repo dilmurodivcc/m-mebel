@@ -10,7 +10,9 @@ export default function RootLayout({
       <head>
         <title>Mabel</title>
       </head>
-      <body>{children}</body>
+      <body>
+        <div className="container">{children}</div>
+      </body>
     </html>
   );
 }

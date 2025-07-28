@@ -1,11 +1,11 @@
 @use "./variables" as *;
 .container {
-  max-width: 1220px;
+  max-width: 1300px;
   margin: 0 auto;
 }
 
 body {
-  font-family: $font-family;
-  background-color: $bg;
-  color: $white;
+  font-family: var(--font-family);
+  background-color: var(--bg);
+  color: var(--text);
 }

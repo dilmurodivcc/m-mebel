@@ -1,7 +1,8 @@
 @use "./base/variables" as *;
 @use "./base/base" as *;
 @use "./base/resets" as *;
-@use './pages/home' as *;
+@use "./pages/home" as *;
+@use "./components/ui/buttons" as *;
 @use "./components/layout/header" as *;
 @use "./components/layout/footer" as *;
-@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playwrite+AU+QLD:wght@100..400&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');

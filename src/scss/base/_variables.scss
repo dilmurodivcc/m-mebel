@@ -1,5 +1,23 @@
-$font-family: "Inter", Arial, sans-serif;
-$black: #000;
-$white: #fff;
-$bg: #000;
-$text: #cccccc;
+// default light mode
+:root {
+  --black: #000;
+  --white: #fff;
+  --bg: #fcfaf7;
+  --bg-secondary: #f2ede8;
+  --text: #1c140d;
+  --text-secondary: #fff;
+  --text-tertiary: #96734f;
+  --border-color: #e5e8eb;
+  --font-family: "Work Sans", sans-serif;
+  --font-secondary: "Playwrite AU QLD", cursive;
+}
+// dark mode
+.dark {
+  --black: #fff;
+  --white: #000;
+  --bg: #f2ede8;
+  --bg-secondary: #f2ede8;
+  --text: #ffff;
+  --text-secondary: #c9ad91;
+  --text-tertiary: #fff;
+}
