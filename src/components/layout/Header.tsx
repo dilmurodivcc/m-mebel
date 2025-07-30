@@ -7,7 +7,10 @@ import { LuSunMedium, LuMoon } from "react-icons/lu";
 import { GrLanguage } from "react-icons/gr";
 import { useCategoryStore } from "@/app/category/store";
 import type { CategoryState } from "@/app/category/store";
-import { useRouter } from "next/navigation";
+import { useThemeStore } from "@/app/theme/store";
+import { useRouter, usePathname } from "next/navigation";
+import { products, type Product } from "@/data/products";
+import { useTranslation } from "react-i18next";
 
 const languages = [
   {
@@ -26,17 +29,22 @@ const languages = [
     icon: "/icons/en.jpg",
   },
 ];
+
 const categories = [
-  { name: "Sofas" },
-  { name: "Tables" },
-  { name: "Chairs" },
-  { name: "Storage" },
-  { name: "Beds" },
-  { name: "Decor" },
+  { name: "sofas" },
+  { name: "coffeeTables" },
+  { name: "endTables" },
+  { name: "tvStands" },
+  { name: "armchairs" },
 ];
+
 const Header = () => {
-  const [theme, setTheme] = useState("light");
+  const { t, i18n } = useTranslation();
+  const { theme, toggleTheme } = useThemeStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const selectedCategory = useCategoryStore(
     (state: CategoryState) => state.selectedCategory
   );
@@ -44,61 +52,152 @@ const Header = () => {
     (state: CategoryState) => state.setSelectedCategory
   );
   const router = useRouter();
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
+
+  // Search functionality
+  useEffect(() => {
+    if (searchQuery.trim().length > 0) {
+      const filtered = products.filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.category.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setSearchResults(filtered.slice(0, 5)); // Show max 5 results
+      setShowSearchResults(true);
+    } else {
+      setSearchResults([]);
+      setShowSearchResults(false);
+    }
+  }, [searchQuery]);
+
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
+
+  const handleSearchResultClick = (productId: number) => {
+    setSearchQuery("");
+    setShowSearchResults(false);
+    router.push(`/product/${productId}`);
+  };
+
+  const handleSearchInputFocus = () => {
+    if (searchQuery.trim().length > 0) {
+      setShowSearchResults(true);
+    }
+  };
+
+  const handleSearchInputBlur = () => {
+    // Delay hiding to allow clicking on results
+    setTimeout(() => {
+      setShowSearchResults(false);
+    }, 200);
+  };
+
+  const handleLanguageChange = (languageCode: string) => {
+    i18n.changeLanguage(languageCode);
+    setIsDropdownOpen(false);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
       if (isDropdownOpen && target && !target.closest(".dropdown-content")) {
         setIsDropdownOpen(false);
       }
+      // Close search results when clicking outside
+      if (showSearchResults && target && !target.closest(".search-container")) {
+        setShowSearchResults(false);
+      }
     };
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }, [isDropdownOpen]);
+  }, [isDropdownOpen, showSearchResults]);
+
   return (
     <header className="header">
-      <div className="logo">
-        <img width={80} src="/icons/logo.png" alt="logo" />
-        <h5>forniture</h5>
-      </div>
+      <Link href="/" className="logo">
+        <img src="/icons/logo.png" alt="logo" />
+        <h5>{t("logo")}</h5>
+      </Link>
       <nav className="navbar">
-        <ul className="menu-list">
-          <li>
-            <Link href="/category">Best Sellers </Link>
-          </li>
-          {categories.map((cat) => (
-            <li key={cat.name}>
-              <button
-                className={
-                  selectedCategory === cat.name ? "active-category" : ""
-                }
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "inherit",
-                  font: "inherit",
-                }}
-                onClick={() => {
-                  setSelectedCategory(cat.name);
-                  router.push("/category");
-                }}
-              >
-                {cat.name}
-              </button>
-            </li>
-          ))}
-        </ul>
+        {!isHomePage ? (
+          <div className="search-container">
+            <div className="search-bar">
+              <IoSearchOutline className="search-icon" />
+              <input
+                type="text"
+                placeholder={t("searchPlaceholder")}
+                value={searchQuery}
+                onChange={handleSearchInputChange}
+                onFocus={handleSearchInputFocus}
+                onBlur={handleSearchInputBlur}
+                className="search-input"
+              />
+            </div>
+            {showSearchResults && searchResults.length > 0 && (
+              <div className="search-results">
+                {searchResults.map((product) => (
+                  <div
+                    key={product.id}
+                    className="search-result-item"
+                    onClick={() => handleSearchResultClick(product.id)}
+                  >
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="search-result-image"
+                    />
+                    <div className="search-result-content">
+                      <div className="search-result-name">
+                        {t(product.name.toLowerCase().replace(/\s+/g, ""))}
+                      </div>
+                      <div className="search-result-category">
+                        {t(product.category)}
+                      </div>
+                      <div className="search-result-price">
+                        ${product.price.toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <ul className="menu-list">
+            {categories.map((cat) => (
+              <li key={cat.name}>
+                <button
+                  className={
+                    selectedCategory === cat.name ? "active-category" : ""
+                  }
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "inherit",
+                    font: "inherit",
+                  }}
+                  onClick={() => {
+                    setSelectedCategory(cat.name);
+                    router.push("/category");
+                  }}
+                >
+                  {t(cat.name)}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
         <ul className="btn-group">
-          <li>
+          {/* <li>
             <button className="primary-btn">
               <IoSearchOutline />
             </button>
-          </li>
+          </li> */}
           <li>
             <button className="primary-btn" onClick={toggleTheme}>
               {theme === "light" ? <LuSunMedium /> : <LuMoon />}
@@ -113,9 +212,12 @@ const Header = () => {
             </button>
             {isDropdownOpen && (
               <div className="dropdown-overlay">
-                <ul className="dropdown-content">
+                <ul className="dropdown-content dropdown-anim">
                   {languages.map((language) => (
-                    <li key={language.code}>
+                    <li
+                      key={language.code}
+                      onClick={() => handleLanguageChange(language.code)}
+                    >
                       <img
                         width={18}
                         height={18}

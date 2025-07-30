@@ -1,19 +1,22 @@
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
 
-// Example translations
+// Import JSON files
+import enTranslations from './locales/en.json';
+import uzTranslations from './locales/uz.json';
+import ruTranslations from './locales/ru.json';
+
 const resources = {
   en: {
-    translation: {
-      hello: 'Hello',
-    },
+    translation: enTranslations
+  },
+  uz: {
+    translation: uzTranslations
   },
   ru: {
-    translation: {
-      hello: 'Привет',
-    },
-  },
+    translation: ruTranslations
+  }
 };
 
 i18n
@@ -21,14 +24,14 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: 'en',
-    debug: process.env.NODE_ENV === 'development',
+    fallbackLng: "en",
+    debug: false,
     interpolation: {
       escapeValue: false,
     },
     detection: {
-      order: ['querystring', 'cookie', 'localStorage', 'navigator', 'htmlTag'],
-      caches: ['localStorage', 'cookie'],
+      order: ["localStorage", "navigator"],
+      caches: ["localStorage"],
     },
   });
 

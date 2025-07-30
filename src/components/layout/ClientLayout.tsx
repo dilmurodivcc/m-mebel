@@ -1,6 +1,7 @@
 "use client";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
+import ThemeProvider from "../providers/ThemeProvider";
 
 export default function ClientLayout({
   children,
@@ -11,13 +12,13 @@ export default function ClientLayout({
   showHeader?: boolean;
   showFooter?: boolean;
 }) {
+  const isNeedSpace = showHeader;
   return (
-    <>
-      
-      <div className="space" style={{ height: "100px" }}></div>
+    <ThemeProvider>
+      {isNeedSpace && <div className="space" style={{ height: "100px" }}></div>}
       {showHeader && <Header />}
       {children}
       {showFooter && <Footer />}
-    </>
+    </ThemeProvider>
   );
 }

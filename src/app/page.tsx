@@ -9,32 +9,29 @@ export default function Home() {
 
   const featuredCollections = [
     {
-      title: "The Living Room Edit",
-      description:
-        "Create a cozy and inviting living space with our curated collection of sofas, coffee tables, and more.",
+      title: "livingRoomEdit",
+      description: "livingRoomDescription",
       image: "/img/cardimg.png",
     },
     {
-      title: "The Bedroom Refresh",
-      description:
-        "Transform your bedroom into a relaxing retreat with our stylish beds, nightstands, and bedding.",
+      title: "bedroomRefresh",
+      description: "bedroomDescription",
       image: "/img/cardimg.png",
     },
     {
-      title: "The Dining Room Update",
-      description:
-        "Elevate your dining experience with our elegant tables, chairs, and tableware.",
+      title: "diningRoomUpdate",
+      description: "diningRoomDescription",
       image: "/img/cardimg.png",
     },
   ];
 
   const categories = [
-    { name: "Sofas", image: "/img/cardimg.png" },
-    { name: "Beds", image: "/img/cardimg.png" },
-    { name: "Dining Tables", image: "/img/cardimg.png" },
-    { name: "Chairs", image: "/img/cardimg.png" },
-    { name: "Storage", image: "/img/cardimg.png" },
-    { name: "Decor", image: "/img/cardimg.png" },
+    { name: "sofas", image: "/img/cardimg.png" },
+    { name: "sectionals", image: "/img/cardimg.png" },
+    { name: "coffeeTables", image: "/img/cardimg.png" },
+    { name: "endTables", image: "/img/cardimg.png" },
+    { name: "tvStands", image: "/img/cardimg.png" },
+    { name: "armchairs", image: "/img/cardimg.png" },
   ];
 
   return (
@@ -42,26 +39,23 @@ export default function Home() {
       <main className="home-page">
         <section className="hero-section">
           <div className="hero-content">
-            <h1>Find your perfect piece</h1>
-            <p>
-              Explore our curated collection of furniture and decor to create a
-              home you love.
-            </p>
+            <h1>{t("heroTitle")}</h1>
+            <p>{t("heroSubtitle")}</p>
           </div>
         </section>
 
         <section className="featured-collections">
           <div className="container">
-            <h2>Featured Collections</h2>
+            <h2>{t("featuredCollections")}</h2>
             <div className="collections-grid">
               {featuredCollections.map((collection, index) => (
                 <div key={index} className="collection-card">
                   <div className="card-image">
-                    <img src={collection.image} alt={collection.title} />
+                    <img src={collection.image} alt={t(collection.title)} />
                   </div>
                   <div className="card-content">
-                    <h3>{collection.title}</h3>
-                    <p>{collection.description}</p>
+                    <h3>{t(collection.title)}</h3>
+                    <p>{t(collection.description)}</p>
                   </div>
                 </div>
               ))}
@@ -72,14 +66,14 @@ export default function Home() {
         {/* Shop by Category */}
         <section className="shop-category">
           <div className="container">
-            <h2>Shop by Category</h2>
+            <h2>{t("shopByCategory")}</h2>
             <div className="category-grid">
               {categories.map((category, index) => (
                 <div key={index} className="category-card">
                   <div className="category-image">
-                    <img src={category.image} alt={category.name} />
+                    <img src={category.image} alt={t(category.name)} />
                   </div>
-                  <h3>{category.name}</h3>
+                  <h3>{t(category.name)}</h3>
                 </div>
               ))}
             </div>
@@ -89,16 +83,16 @@ export default function Home() {
         {/* New Arrivals */}
         <section className="new-arrivals">
           <div className="container">
-            <h2>New Arrivals</h2>
+            <h2>{t("newArrivals")}</h2>
             <div className="collections-grid">
               {featuredCollections.map((collection, index) => (
                 <div key={index} className="collection-card">
                   <div className="card-image">
-                    <img src={collection.image} alt={collection.title} />
+                    <img src={collection.image} alt={t(collection.title)} />
                   </div>
                   <div className="card-content">
-                    <h3>{collection.title}</h3>
-                    <p>{collection.description}</p>
+                    <h3>{t(collection.title)}</h3>
+                    <p>{t(collection.description)}</p>
                   </div>
                 </div>
               ))}

@@ -6,7 +6,6 @@
 // Hero Section
 .hero-section {
   position: relative;
-  height: calc(100vh - 200px);
   background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
     url("/img/heroimg.png") center/cover no-repeat;
   border-radius: 20px;
@@ -16,23 +15,24 @@
   flex-direction: column;
   padding: 30px;
   text-align: center;
-  color: var(--white);
+  color: var(--text);
   max-height: 660px;
+  height: calc(100vh - 120px);
 
   .hero-content {
     h1 {
-      font-family: var(--font-secondary);
+      font-family: var(--text-secondary);
       font-size: 60px;
-      font-weight: black;
+      font-weight: 900;
       margin-bottom: 1rem;
-      color: var(--white);
+      color: var(--text-secondary);
     }
 
     p {
       font-family: var(--font-family);
       font-size: 20px;
       line-height: 1.6;
-      color: var(--white);
+      color: var(--text-secondary);
       opacity: 0.9;
     }
   }

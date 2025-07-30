@@ -1,26 +1,19 @@
-import React, { useState } from "react";
+import React from "react";
 import { FaInstagram, FaTelegramPlane } from "react-icons/fa";
-import { GrLanguage } from "react-icons/gr";
-import { LuSunMedium, LuMoon } from "react-icons/lu";
 import { FaYoutube } from "react-icons/fa";
-const categories = [
-  { name: "Sofas", path: "/category/sofas" },
-  { name: "Beds", path: "/category/beds" },
-  { name: "Dining Tables", path: "/category/dining-tables" },
-  { name: "Chairs", path: "/category/chairs" },
-  { name: "Storage", path: "/category/storage" },
-  { name: "Decor", path: "/category/decor" },
-];
+import { useTranslation } from "react-i18next";
 
-const languages = [
-  { name: "Uzbek", code: "uz", icon: "/icons/uz.avif" },
-  { name: "Russian", code: "ru", icon: "/icons/ru.png" },
-  { name: "English", code: "en", icon: "/icons/en.jpg" },
+const categories = [
+  { name: "sofas", path: "/category/sofas" },
+  { name: "sectionals", path: "/category/sectionals" },
+  { name: "coffeeTables", path: "/category/coffee-tables" },
+  { name: "endTables", path: "/category/end-tables" },
+  { name: "tvStands", path: "/category/tv-stands" },
+  { name: "armchairs", path: "/category/armchairs" },
 ];
 
 const Footer = () => {
-  const [theme, setTheme] = useState("light");
-  const [lang, setLang] = useState("en");
+  const { t } = useTranslation();
 
   return (
     <footer className="footer">
@@ -28,7 +21,7 @@ const Footer = () => {
         <div className="column">
           <div className="footer__brand">
             <img src="/icons/logo.png" alt="logo" width={60} />
-            <span>forniture</span>
+            <span>{t("logo")}</span>
           </div>
           <div className="footer__social">
             <a
@@ -45,7 +38,6 @@ const Footer = () => {
               rel="noopener noreferrer"
               aria-label="Telegram"
             >
-
               <FaTelegramPlane />
             </a>
             <a
@@ -59,10 +51,10 @@ const Footer = () => {
           </div>
         </div>
         <ul className="footer__links">
-          <li className="title">Categories</li>
+          <li className="title">{t("shopByCategory")}</li>
           {categories.map((cat) => (
             <li key={cat.name}>
-              <a href={cat.path}>{cat.name}</a>
+              <a href={cat.path}>{t(cat.name)}</a>
             </li>
           ))}
         </ul>
