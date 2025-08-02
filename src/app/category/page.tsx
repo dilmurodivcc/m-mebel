@@ -13,6 +13,7 @@ import { BsList } from "react-icons/bs";
 import { useRouter } from "next/navigation";
 import { products } from "@/data/products";
 import { useTranslation } from "react-i18next";
+
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
@@ -152,6 +153,8 @@ const Category = () => {
   return (
     <ClientLayout showHeader={true} showFooter={true}>
       <main className="category-page">
+
+
         <nav className="breadcrumb">
           <span className="breadcrumb-main">{t("breadcrumbMain")}</span> /{" "}
           <span className="breadcrumb-current">

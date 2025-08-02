@@ -1,0 +1,128 @@
+@use "../../base/variables" as *;
+
+.language-changer {
+  position: relative;
+
+  .primary-btn {
+    background-color: var(--bg-secondary);
+    color: var(--text);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover {
+      background-color: var(--bg-tertiary);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  .dropdown-overlay {
+    position: absolute;
+    z-index: 1001;
+  }
+
+  .dropdown-content {
+    background: var(--bg-secondary);
+    border: 1.5px solid var(--border-color);
+    border-radius: 18px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    padding: 8px;
+    width: 130px;
+    margin-top: 6px;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: start;
+    gap: 4px !important;
+
+    li {
+      padding: 8px 8px;
+      cursor: pointer;
+      color: var(--text);
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: start;
+      gap: 8px;
+      border-radius: 12px;
+      width: 100%;
+      transition: background 0.15s, color 0.15s;
+      position: relative;
+
+      &:hover {
+        box-shadow: inset 0 0 10px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      &.active {
+        background: rgba(235, 150, 66, 0.1);
+        color: var(--bg-tertiary);
+        font-weight: 600;
+      }
+
+      img {
+        border: 1px solid var(--border-color);
+      }
+
+      .active-indicator {
+        position: absolute;
+        right: 8px;
+        color: var(--bg-tertiary);
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  .dropdown-anim {
+    animation: dropdownFadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: top right;
+  }
+}
+
+@keyframes dropdownFadeIn {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.95) translateY(-8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1) translateY(0);
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .language-changer {
+    .dropdown-overlay {
+      right: -50px;
+    }
+
+    .dropdown-content {
+      width: 120px;
+
+      li {
+        font-size: 14px;
+        padding: 6px 6px;
+      }
+    }
+  }
+} 

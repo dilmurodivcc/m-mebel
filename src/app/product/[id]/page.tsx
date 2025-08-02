@@ -8,6 +8,7 @@ import { LuSunMedium, LuMoon } from "react-icons/lu";
 import { getProductById } from "@/data/products";
 import { useThemeStore } from "@/app/theme/store";
 import { useTranslation } from "react-i18next";
+import LanguageChanger from "@/components/ui/LanguageChanger";
 
 export const dynamic = "force-dynamic";
 
@@ -39,14 +40,7 @@ const ProductDetail = () => {
   return (
     <ClientLayout showHeader={false} showFooter={false}>
       <main className="product-detail-page">
-        {/* Theme changer */}
-        <button
-          className="theme-changer-btn"
-          onClick={toggleTheme}
-          aria-label="Theme changer"
-        >
-          {theme === "light" ? <LuSunMedium /> : <LuMoon />}
-        </button>
+        <div className="actions">
 
         {/* Back button */}
         <button
@@ -57,6 +51,17 @@ const ProductDetail = () => {
           <MdKeyboardArrowLeft size={24} />
           {t("backButton")}
         </button>
+        <div className="left_actions" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <button
+            className="primary-btn"
+            onClick={toggleTheme}
+            aria-label="Theme changer"
+          >
+            {theme === "light" ? <LuSunMedium /> : <LuMoon />}
+          </button>
+          <LanguageChanger />
+          </div>
+        </div>
 
         {/* Breadcrumb */}
         <nav className="breadcrumb">

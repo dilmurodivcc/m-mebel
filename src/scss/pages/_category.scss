@@ -2,6 +2,20 @@
 
 .category-page {
   padding: 16px;
+  position: relative;
+
+  // Language Changer Container
+  .language-changer-container {
+    position: fixed;
+    top: 120px;
+    right: 30px;
+    z-index: 1000;
+
+    @media (max-width: 768px) {
+      top: 100px;
+      right: 20px;
+    }
+  }
 }
 .category-filter-panel {
   display: flex;

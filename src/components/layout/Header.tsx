@@ -4,31 +4,13 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { LuSunMedium, LuMoon } from "react-icons/lu";
-import { GrLanguage } from "react-icons/gr";
 import { useCategoryStore } from "@/app/category/store";
 import type { CategoryState } from "@/app/category/store";
 import { useThemeStore } from "@/app/theme/store";
 import { useRouter, usePathname } from "next/navigation";
 import { products, type Product } from "@/data/products";
 import { useTranslation } from "react-i18next";
-
-const languages = [
-  {
-    name: "Uzbek",
-    code: "uz",
-    icon: "/icons/uz.avif",
-  },
-  {
-    name: "Russian",
-    code: "ru",
-    icon: "/icons/ru.png",
-  },
-  {
-    name: "English",
-    code: "en",
-    icon: "/icons/en.jpg",
-  },
-];
+import LanguageChanger from "../ui/LanguageChanger";
 
 const categories = [
   { name: "sofas" },
@@ -39,9 +21,8 @@ const categories = [
 ];
 
 const Header = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { theme, toggleTheme } = useThemeStore();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -92,17 +73,9 @@ const Header = () => {
     }, 200);
   };
 
-  const handleLanguageChange = (languageCode: string) => {
-    i18n.changeLanguage(languageCode);
-    setIsDropdownOpen(false);
-  };
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
-      if (isDropdownOpen && target && !target.closest(".dropdown-content")) {
-        setIsDropdownOpen(false);
-      }
       if (showSearchResults && target && !target.closest(".search-container")) {
         setShowSearchResults(false);
       }
@@ -111,7 +84,7 @@ const Header = () => {
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }, [isDropdownOpen, showSearchResults]);
+  }, [showSearchResults]);
 
   return (
     <header className="header">
@@ -196,33 +169,7 @@ const Header = () => {
             </button>
           </li>
           <li>
-            <button
-              className="primary-btn"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            >
-              <GrLanguage />
-            </button>
-            {isDropdownOpen && (
-              <div className="dropdown-overlay">
-                <ul className="dropdown-content dropdown-anim">
-                  {languages.map((language) => (
-                    <li
-                      key={language.code}
-                      onClick={() => handleLanguageChange(language.code)}
-                    >
-                      <img
-                        width={18}
-                        height={18}
-                        style={{ borderRadius: "50%" }}
-                        src={language.icon}
-                        alt={language.name}
-                      />
-                      {language.name}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            <LanguageChanger />
           </li>
         </ul>
       </nav>
