@@ -10,7 +10,6 @@ import {
 } from "react-icons/md";
 import { CiGrid41 } from "react-icons/ci";
 import { BsList } from "react-icons/bs";
-import { useRouter } from "next/navigation";
 import { products } from "@/data/products";
 import { useTranslation } from "react-i18next";
 
@@ -73,7 +72,6 @@ const Category = () => {
   const setLayout = useCategoryStore((s) => s.setLayout);
   const currentPage = useCategoryStore((s) => s.currentPage);
   const setCurrentPage = useCategoryStore((s) => s.setCurrentPage);
-  const router = useRouter();
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange] = useState<{ min: string; max: string }>({
@@ -153,8 +151,6 @@ const Category = () => {
   return (
     <ClientLayout showHeader={true} showFooter={true}>
       <main className="category-page">
-
-
         <nav className="breadcrumb">
           <span className="breadcrumb-main">{t("breadcrumbMain")}</span> /{" "}
           <span className="breadcrumb-current">
