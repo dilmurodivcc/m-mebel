@@ -3,9 +3,19 @@
 import "../i18n";
 import { useTranslation } from "react-i18next";
 import ClientLayout from "../components/layout/ClientLayout";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from 'next/link';
+
+
+export const dynamic = "force-dynamic";
 
 export default function Home() {
   const { t } = useTranslation();
+  const router = useRouter();
+  useEffect(() => {
+    router.prefetch("/category");
+  }, []);
 
   const featuredCollections = [
     {
@@ -63,24 +73,22 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Shop by Category */}
         <section className="shop-category">
           <div className="container">
             <h2>{t("shopByCategory")}</h2>
             <div className="category-grid">
               {categories.map((category, index) => (
-                <div key={index} className="category-card">
+                <Link href={`/category`} key={index} className="category-card">
                   <div className="category-image">
                     <img src={category.image} alt={t(category.name)} />
                   </div>
                   <h3>{t(category.name)}</h3>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
-        </section>
+        </section>  
 
-        {/* New Arrivals */}
         <section className="new-arrivals">
           <div className="container">
             <h2>{t("newArrivals")}</h2>

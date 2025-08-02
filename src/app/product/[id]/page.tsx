@@ -9,7 +9,7 @@ import { getProductById } from "@/data/products";
 import { useThemeStore } from "@/app/theme/store";
 import { useTranslation } from "react-i18next";
 
-
+export const dynamic = "force-dynamic";
 
 const ProductDetail = () => {
   const { t } = useTranslation();

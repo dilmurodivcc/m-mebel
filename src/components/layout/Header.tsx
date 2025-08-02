@@ -55,7 +55,6 @@ const Header = () => {
   const pathname = usePathname();
   const isHomePage = pathname === "/";
 
-  // Search functionality
   useEffect(() => {
     if (searchQuery.trim().length > 0) {
       const filtered = products.filter(
@@ -63,7 +62,7 @@ const Header = () => {
           product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           product.category.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setSearchResults(filtered.slice(0, 5)); // Show max 5 results
+      setSearchResults(filtered.slice(0, 5));
       setShowSearchResults(true);
     } else {
       setSearchResults([]);
@@ -88,7 +87,6 @@ const Header = () => {
   };
 
   const handleSearchInputBlur = () => {
-    // Delay hiding to allow clicking on results
     setTimeout(() => {
       setShowSearchResults(false);
     }, 200);
@@ -105,7 +103,6 @@ const Header = () => {
       if (isDropdownOpen && target && !target.closest(".dropdown-content")) {
         setIsDropdownOpen(false);
       }
-      // Close search results when clicking outside
       if (showSearchResults && target && !target.closest(".search-container")) {
         setShowSearchResults(false);
       }
@@ -193,11 +190,6 @@ const Header = () => {
           </ul>
         )}
         <ul className="btn-group">
-          {/* <li>
-            <button className="primary-btn">
-              <IoSearchOutline />
-            </button>
-          </li> */}
           <li>
             <button className="primary-btn" onClick={toggleTheme}>
               {theme === "light" ? <LuSunMedium /> : <LuMoon />}

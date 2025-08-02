@@ -2,18 +2,20 @@ import React from "react";
 import { FaInstagram, FaTelegramPlane } from "react-icons/fa";
 import { FaYoutube } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import Link from "next/link";
+import { useCategoryStore } from "@/app/category/store";
 
 const categories = [
-  { name: "sofas", path: "/category/sofas" },
-  { name: "sectionals", path: "/category/sectionals" },
-  { name: "coffeeTables", path: "/category/coffee-tables" },
-  { name: "endTables", path: "/category/end-tables" },
-  { name: "tvStands", path: "/category/tv-stands" },
-  { name: "armchairs", path: "/category/armchairs" },
+  { name: "sofas" },
+  { name: "coffeeTables" },
+  { name: "endTables" },
+  { name: "tvStands" },
+  { name: "armchairs" },
 ];
 
 const Footer = () => {
   const { t } = useTranslation();
+  const setSelectedCategory = useCategoryStore((state) => state.setSelectedCategory);
 
   return (
     <footer className="footer">
@@ -54,7 +56,12 @@ const Footer = () => {
           <li className="title">{t("shopByCategory")}</li>
           {categories.map((cat) => (
             <li key={cat.name}>
-              <a href={cat.path}>{t(cat.name)}</a>
+              <Link
+                href="/category"
+                onClick={() => setSelectedCategory(cat.name)}
+              >
+                {t(cat.name)}
+              </Link>
             </li>
           ))}
         </ul>

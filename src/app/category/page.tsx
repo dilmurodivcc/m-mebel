@@ -13,6 +13,9 @@ import { BsList } from "react-icons/bs";
 import { useRouter } from "next/navigation";
 import { products } from "@/data/products";
 import { useTranslation } from "react-i18next";
+export const dynamic = "force-dynamic";
+
+import Link from "next/link";
 
 const mockProducts = products;
 
@@ -130,7 +133,6 @@ const Category = () => {
   const handleCategoryClick = (cat: string) => {
     if (cat === t("allCategories")) {
       setSelectedCategories([]);
-      // Clear selected category from store when "Barchasi" is clicked
       useCategoryStore.getState().setSelectedCategory("");
     } else if (selectedCategories.includes(cat)) {
       setSelectedCategories(selectedCategories.filter((c) => c !== cat));
@@ -252,7 +254,6 @@ const Category = () => {
             </button>
           </div>
         </div>
-        {/* Products */}
         <div
           className={
             layout === "grid"
@@ -261,13 +262,12 @@ const Category = () => {
           }
         >
           {paginatedProducts.map((product) => (
-            <div
+            <Link
+              href={`/product/${product.id}`}
               key={product.id}
               className={`product-card category-product-card${
                 layout === "grid" ? " grid" : " list"
               }`}
-              onClick={() => router.push(`/product/${product.id}`)}
-              style={{ cursor: "pointer" }}
             >
               <img
                 src={product.image}
@@ -276,15 +276,20 @@ const Category = () => {
                   layout === "grid" ? " grid" : " list"
                 }`}
               />
-              <div>
+              <div className="category-product-content">
                 <div className="category-product-name">
                   {t(product.name.toLowerCase().replace(/\s+/g, ""))}
                 </div>
+                {layout === "list" && (
+                  <div className="category-product-description">
+                    {t(product.description.toLowerCase().replace(/\s+/g, ""))}
+                  </div>
+                )}
                 <div className="category-product-price">
                   ${product.price.toLocaleString()}
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
         <div className="category-pagination">

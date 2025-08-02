@@ -1,4 +1,6 @@
 import "../scss/main.scss";
+import { Suspense } from "react";
+import Loading from "./loading";
 
 export default function RootLayout({
   children,
@@ -11,7 +13,9 @@ export default function RootLayout({
         <title>Mabel</title>
       </head>
       <body>
-        <div className="container">{children}</div>
+        <Suspense fallback={<Loading />}>
+          <div className="container">{children}</div>
+        </Suspense>
       </body>
     </html>
   );
