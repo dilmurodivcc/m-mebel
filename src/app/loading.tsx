@@ -1,8 +1,7 @@
 export default function Loading() {
-    return (
-      <div className="loading">
-        loading...
-      </div>
-    );
-  }
-  
+  return (
+    <div className="base-loading">
+      <span className="loader"></span>{" "}
+    </div>
+  );
+}
