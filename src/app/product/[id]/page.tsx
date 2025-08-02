@@ -18,6 +18,7 @@ const ProductDetail = () => {
   const router = useRouter();
   const { theme, toggleTheme } = useThemeStore();
   const [selectedImage, setSelectedImage] = useState(0);
+  const [showContactInfo, setShowContactInfo] = useState(false);
 
   const productId = Number(params.id);
   const product = getProductById(productId);
@@ -37,33 +38,38 @@ const ProductDetail = () => {
     );
   }
 
+  const handleContactClick = () => {
+    setShowContactInfo(!showContactInfo);
+  };
+
   return (
     <ClientLayout showHeader={false} showFooter={false}>
       <main className="product-detail-page">
         <div className="actions">
-
-        {/* Back button */}
-        <button
-          className="back-btn"
-          onClick={() => router.back()}
-          aria-label="Go back"
-        >
-          <MdKeyboardArrowLeft size={24} />
-          {t("backButton")}
-        </button>
-        <div className="left_actions" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          {/* Back button */}
           <button
-            className="primary-btn"
-            onClick={toggleTheme}
-            aria-label="Theme changer"
+            className="back-btn"
+            onClick={() => router.back()}
+            aria-label="Go back"
           >
-            {theme === "light" ? <LuSunMedium /> : <LuMoon />}
+            <MdKeyboardArrowLeft size={24} />
+            {t("backButton")}
           </button>
-          <LanguageChanger />
+          <div
+            className="left_actions"
+            style={{ display: "flex", alignItems: "center", gap: "10px" }}
+          >
+            <button
+              className="primary-btn"
+              onClick={toggleTheme}
+              aria-label="Theme changer"
+            >
+              {theme === "light" ? <LuSunMedium /> : <LuMoon />}
+            </button>
+            <LanguageChanger />
           </div>
         </div>
 
-        {/* Breadcrumb */}
         <nav className="breadcrumb">
           <span className="breadcrumb-main">{t("breadcrumbMain")}</span> /{" "}
           <span className="breadcrumb-category">
@@ -145,25 +151,35 @@ const ProductDetail = () => {
                   ),
                 })}
               </p>
-              <div className="contact-details">
-                <div className="contact-item">
-                  <span className="contact-label">{t("phone")}</span>
-                  <span className="contact-value">
-                    {product.contactInfo?.phone || "(555) 123-4567"}
-                  </span>
-                </div>
-                <div className="contact-item">
-                  <span className="contact-label">{t("email")}</span>
-                  <span className="contact-value">
-                    {product.contactInfo?.email || "sales@cozyhome.com"}
-                  </span>
-                </div>
-              </div>
-            </div>
 
-            <button className="contact-shop-btn">
-              {t("contactShopAssistant")}
-            </button>
+              <button
+                className={`contact-shop-btn ${
+                  showContactInfo ? "active" : ""
+                }`}
+                onClick={handleContactClick}
+              >
+                {showContactInfo
+                  ? t("hideContactInfo")
+                  : t("contactShopAssistant")}
+              </button>
+
+              {showContactInfo && (
+                <div className="contact-details contact-animation">
+                  <div className="contact-item">
+                    <span className="contact-label">{t("phone")}</span>
+                    <span className="contact-value">
+                      {product.contactInfo?.phone || "(555) 123-4567"}
+                    </span>
+                  </div>
+                  <div className="contact-item">
+                    <span className="contact-label">{t("email")}</span>
+                    <span className="contact-value">
+                      {product.contactInfo?.email || "sales@cozyhome.com"}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </main>

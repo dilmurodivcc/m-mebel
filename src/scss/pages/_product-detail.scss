@@ -3,8 +3,6 @@
   max-width: 1200px;
   margin: 0 auto;
   position: relative;
-
-
 }
 
 .actions {
@@ -15,6 +13,10 @@
 }
 
 .back-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 8px 16px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -35,16 +37,14 @@
 .breadcrumb {
   margin-bottom: 32px;
   font-size: 14px;
+  color: var(--text-tertiary);
 }
 
 .breadcrumb-main {
   color: var(--text-tertiary);
 }
 
-.breadcrumb-category {
-  color: var(--text);
-}
-
+.breadcrumb-category,
 .breadcrumb-current {
   color: var(--text);
   font-weight: 600;
@@ -90,6 +90,7 @@
   object-fit: cover;
   border-radius: 8px;
   cursor: pointer;
+  transition: all 0.2s;
   border: 2px solid transparent;
   transition: all 0.2s;
   opacity: 0.7;
@@ -154,33 +155,62 @@
 }
 
 .spec-label {
+  font-size: 14px;
+  color: var(--text-tertiary);
   font-weight: 500;
-  color: var(--text);
 }
 
 .spec-value {
-  color: var(--text-tertiary);
-  font-weight: 600;
-  text-align: right;
-  max-width: 60%;
-}
-
-.ordering-info {
-  margin-top: 24px;
-}
-
-.ordering-text {
+  font-size: 16px;
   color: var(--text);
-  line-height: 1.6;
-  margin-bottom: 16px;
-  font-size: 14px;
+  font-weight: 600;
+}
+
+.contact-shop-btn {
+  background: var(--bg-tertiary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 16px;
+
+  &:hover {
+    background: var(--bg-tertiary);
+    box-shadow: 0 4px 12px rgba(235, 150, 66, 0.3);
+  }
+
 }
 
 .contact-details {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.contact-animation {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 200px;
+  }
 }
 
 .contact-item {
@@ -191,33 +221,15 @@
 }
 
 .contact-label {
+  font-size: 14px;
+  color: var(--text-tertiary);
   font-weight: 500;
-  color: var(--text);
 }
 
 .contact-value {
-  color: var(--text-tertiary);
-  font-weight: 600;
-}
-
-.contact-shop-btn {
-  width: 100%;
-  padding: 16px 24px;
-  background: var(--bg-tertiary);
-  color: var(--text-secondary);
-  border: none;
-  border-radius: 12px;
   font-size: 16px;
+  color: var(--text);
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 16px;
-}
-
-.contact-shop-btn:hover {
-  background: var(--text-tertiary);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .product-not-found {
@@ -323,30 +335,17 @@
     font-size: 24px;
   }
 
-  .product-price {
-    font-size: 24px;
-  }
-
   .specs-grid {
     grid-template-columns: 1fr;
   }
 
-  .image-thumbnails {
-    justify-content: center;
-  }
-
-  .contact-details {
-    gap: 12px;
-  }
-
-  .contact-item {
+  .actions {
     flex-direction: column;
+    gap: 16px;
     align-items: flex-start;
-    gap: 4px;
   }
 
-  .spec-value {
-    max-width: 100%;
-    text-align: left;
+  .left_actions {
+    align-self: flex-end;
   }
 }
