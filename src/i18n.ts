@@ -33,6 +33,12 @@ i18n
       order: ["localStorage", "navigator"],
       caches: ["localStorage"],
     },
+    // Performance optimizations
+    react: {
+      useSuspense: false,
+    },
+    load: 'languageOnly',
+    preload: ['en', 'uz', 'ru'],
   });
 
 export default i18n; 

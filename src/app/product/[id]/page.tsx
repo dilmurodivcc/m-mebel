@@ -1,7 +1,7 @@
 "use client";
 
 import ClientLayout from "@/components/layout/ClientLayout";
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { LuSunMedium, LuMoon } from "react-icons/lu";
@@ -23,6 +23,21 @@ const ProductDetail = () => {
   const productId = Number(params.id);
   const product = getProductById(productId);
 
+  // Memoize expensive translation operations
+  const productNameKey = useMemo(
+    () => product?.name.toLowerCase().replace(/\s+/g, ""),
+    [product?.name]
+  );
+
+  const productDescriptionKey = useMemo(
+    () => product?.description.toLowerCase().replace(/\s+/g, ""),
+    [product?.description]
+  );
+
+  const handleContactClick = useCallback(() => {
+    setShowContactInfo(!showContactInfo);
+  }, [showContactInfo]);
+
   if (!product) {
     return (
       <ClientLayout showHeader={false} showFooter={false}>
@@ -37,10 +52,6 @@ const ProductDetail = () => {
       </ClientLayout>
     );
   }
-
-  const handleContactClick = () => {
-    setShowContactInfo(!showContactInfo);
-  };
 
   return (
     <ClientLayout showHeader={false} showFooter={false}>
@@ -77,7 +88,7 @@ const ProductDetail = () => {
           </span>{" "}
           /{" "}
           <span className="breadcrumb-current">
-            {t(product.name.toLowerCase().replace(/\s+/g, ""))}
+            {productNameKey ? t(productNameKey) : product.name}
           </span>
         </nav>
 
@@ -109,7 +120,7 @@ const ProductDetail = () => {
           {/* Product Info */}
           <div className="product-info">
             <h1 className="product-title">
-              {t(product.name.toLowerCase().replace(/\s+/g, ""))}
+              {productNameKey ? t(productNameKey) : product.name}
             </h1>
             <div className="product-price">
               ${product.price.toLocaleString()}
@@ -117,7 +128,11 @@ const ProductDetail = () => {
 
             <div className="product-description">
               <h3>{t("description")}</h3>
-              <p>{t(product.description.toLowerCase().replace(/\s+/g, ""))}</p>
+              <p>
+                {productDescriptionKey
+                  ? t(productDescriptionKey)
+                  : product.description}
+              </p>
             </div>
 
             <div className="product-specs">
@@ -146,9 +161,9 @@ const ProductDetail = () => {
               <h3>{t("orderingInfo")}</h3>
               <p className="ordering-text">
                 {t("orderingText", {
-                  productName: t(
-                    product.name.toLowerCase().replace(/\s+/g, "")
-                  ),
+                  productName: productNameKey
+                    ? t(productNameKey)
+                    : product.name,
                 })}
               </p>
 

@@ -5,17 +5,45 @@ import { useTranslation } from "react-i18next";
 import ClientLayout from "../components/layout/ClientLayout";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from 'next/link';
+import Link from "next/link";
+import { products } from "@/data/products";
 
+// Extend Window interface for setNavigationLoading
+declare global {
+  interface Window {
+    setNavigationLoading?: (loading: boolean) => void;
+  }
+}
 
 export const dynamic = "force-dynamic";
 
 export default function Home() {
   const { t } = useTranslation();
   const router = useRouter();
+
+  // New arrivals products (last 3 products from the products array)
+  const newArrivalsProducts = products.slice(-3);
+
   useEffect(() => {
     router.prefetch("/category");
-  }, []);
+    // Prefetch product pages for better performance
+    newArrivalsProducts.forEach((product) => {
+      router.prefetch(`/product/${product.id}`);
+    });
+  }, [router, newArrivalsProducts]);
+
+  const handleProductClick = () => {
+    // Use setTimeout to make navigation loading non-blocking
+    setTimeout(() => {
+      try {
+        if (typeof window !== "undefined" && window.setNavigationLoading) {
+          window.setNavigationLoading(true);
+        }
+      } catch {
+        console.log("Navigation loading not available");
+      }
+    }, 0);
+  };
 
   const featuredCollections = [
     {
@@ -87,22 +115,33 @@ export default function Home() {
               ))}
             </div>
           </div>
-        </section>  
+        </section>
 
         <section className="new-arrivals">
           <div className="container">
             <h2>{t("newArrivals")}</h2>
             <div className="collections-grid">
-              {featuredCollections.map((collection, index) => (
-                <div key={index} className="collection-card">
+              {newArrivalsProducts.map((product) => (
+                <Link
+                  key={product.id}
+                  href={`/product/${product.id}`}
+                  className="collection-card"
+                  onClick={handleProductClick}
+                  prefetch={true}
+                >
                   <div className="card-image">
-                    <img src={collection.image} alt={t(collection.title)} />
+                    <img
+                      src={product.image}
+                      alt={t(product.name.toLowerCase().replace(/\s+/g, ""))}
+                    />
                   </div>
                   <div className="card-content">
-                    <h3>{t(collection.title)}</h3>
-                    <p>{t(collection.description)}</p>
+                    <h3>{t(product.name.toLowerCase().replace(/\s+/g, ""))}</h3>
+                    <p className="product-price">
+                      ${product.price.toLocaleString()}
+                    </p>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

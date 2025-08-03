@@ -267,6 +267,7 @@ const Category = () => {
               className={`product-card category-product-card${
                 layout === "grid" ? " grid" : " list"
               }`}
+              prefetch={true}
             >
               <img
                 src={product.image}
