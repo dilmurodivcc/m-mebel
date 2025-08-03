@@ -24,13 +24,20 @@ export default function Home() {
   // New arrivals products (last 3 products from the products array)
   const newArrivalsProducts = products.slice(-3);
 
+  // Featured products (first 3 products from the products array)
+  const featuredProducts = products.slice(0, 3);
+
   useEffect(() => {
     router.prefetch("/category");
     // Prefetch product pages for better performance
     newArrivalsProducts.forEach((product) => {
       router.prefetch(`/product/${product.id}`);
     });
-  }, [router, newArrivalsProducts]);
+    // Prefetch featured product pages
+    featuredProducts.forEach((product) => {
+      router.prefetch(`/product/${product.id}`);
+    });
+  }, [router, newArrivalsProducts, featuredProducts]);
 
   const handleProductClick = () => {
     // Use setTimeout to make navigation loading non-blocking
@@ -44,24 +51,6 @@ export default function Home() {
       }
     }, 0);
   };
-
-  const featuredCollections = [
-    {
-      title: "livingRoomEdit",
-      description: "livingRoomDescription",
-      image: "/img/cardimg.png",
-    },
-    {
-      title: "bedroomRefresh",
-      description: "bedroomDescription",
-      image: "/img/cardimg.png",
-    },
-    {
-      title: "diningRoomUpdate",
-      description: "diningRoomDescription",
-      image: "/img/cardimg.png",
-    },
-  ];
 
   const categories = [
     { name: "sofas", image: "/img/cardimg.png" },
@@ -86,16 +75,27 @@ export default function Home() {
           <div className="container">
             <h2>{t("featuredCollections")}</h2>
             <div className="collections-grid">
-              {featuredCollections.map((collection, index) => (
-                <div key={index} className="collection-card">
+              {featuredProducts.map((product) => (
+                <Link
+                  key={product.id}
+                  href={`/product/${product.id}`}
+                  className="collection-card"
+                  onClick={handleProductClick}
+                  prefetch={true}
+                >
                   <div className="card-image">
-                    <img src={collection.image} alt={t(collection.title)} />
+                    <img
+                      src={product.image}
+                      alt={t(product.name.toLowerCase().replace(/\s+/g, ""))}
+                    />
                   </div>
                   <div className="card-content">
-                    <h3>{t(collection.title)}</h3>
-                    <p>{t(collection.description)}</p>
+                    <h3>{t(product.name.toLowerCase().replace(/\s+/g, ""))}</h3>
+                    <p className="product-price">
+                      ${product.price.toLocaleString()}
+                    </p>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
