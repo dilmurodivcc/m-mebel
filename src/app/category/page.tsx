@@ -300,40 +300,39 @@ const Category = () => {
   );
 
   // Memoized filtered and sorted products
-  const { totalPages, paginatedProducts } =
-    useMemo(() => {
-      // Since products are now pre-filtered by API, we only need to apply price filtering
-      const filtered = products.filter((product: ProductForCard) => {
-        const min = priceRange.min ? parseInt(priceRange.min) : 0;
-        const max = priceRange.max ? parseInt(priceRange.max) : Infinity;
-        const priceMatch = product.price >= min && product.price <= max;
-        return priceMatch;
-      });
+  const { totalPages, paginatedProducts } = useMemo(() => {
+    // Since products are now pre-filtered by API, we only need to apply price filtering
+    const filtered = products.filter((product: ProductForCard) => {
+      const min = priceRange.min ? parseInt(priceRange.min) : 0;
+      const max = priceRange.max ? parseInt(priceRange.max) : Infinity;
+      const priceMatch = product.price >= min && product.price <= max;
+      return priceMatch;
+    });
 
-      // Sort products
-      const sorted = [...filtered].sort((a, b) =>
-        sortOrder === "asc" ? a.price - b.price : b.price - a.price
-      );
+    // Sort products
+    const sorted = [...filtered].sort((a, b) =>
+      sortOrder === "asc" ? a.price - b.price : b.price - a.price
+    );
 
-      // Pagination
-      const total = Math.ceil(sorted.length / PRODUCTS_PER_PAGE);
-      const paginated = sorted.slice(
-        (currentPage - 1) * PRODUCTS_PER_PAGE,
-        currentPage * PRODUCTS_PER_PAGE
-      );
+    // Pagination
+    const total = Math.ceil(sorted.length / PRODUCTS_PER_PAGE);
+    const paginated = sorted.slice(
+      (currentPage - 1) * PRODUCTS_PER_PAGE,
+      currentPage * PRODUCTS_PER_PAGE
+    );
 
-      console.log("Final products:", {
-        filtered: filtered.length,
-        sorted: sorted.length,
-        paginated: paginated.length,
-        totalPages: total,
-      });
+    console.log("Final products:", {
+      filtered: filtered.length,
+      sorted: sorted.length,
+      paginated: paginated.length,
+      totalPages: total,
+    });
 
-      return {
-        totalPages: total,
-        paginatedProducts: paginated,
-      };
-    }, [products, priceRange, sortOrder, currentPage]);
+    return {
+      totalPages: total,
+      paginatedProducts: paginated,
+    };
+  }, [products, priceRange, sortOrder, currentPage]);
 
   // Optimized category click handler
   const handleCategoryClick = useCallback(

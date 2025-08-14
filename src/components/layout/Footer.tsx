@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { useCategoryStore } from "@/app/category/store";
 import { useGetCategories } from "@/hooks/getCategories";
+import { FaPhone } from "react-icons/fa6";
+import { TfiEmail } from "react-icons/tfi";
 import {
   useGetSiteInfo,
   useGetSocialMediaLinks,
@@ -73,9 +75,20 @@ const Footer = () => {
           </div>
           {phoneNumbers && (
             <div className="footer__contact">
-              <p>📞 {phoneNumbers.tel1}</p>
-              {phoneNumbers.tel2 && <p>📞 {phoneNumbers.tel2}</p>}
-              {socialMedia?.Email && <p>📧 {socialMedia.Email}</p>}
+              <a href={`tel:${phoneNumbers.tel1}`}>
+                <FaPhone color="green" /> +{phoneNumbers.tel1}
+              </a>
+              {phoneNumbers.tel2 && (
+                <a href={`tel:${phoneNumbers.tel2}`}>
+                  <FaPhone color="green" /> +{phoneNumbers.tel2}
+                </a>
+              )}
+              {socialMedia?.Email && (
+                <a href={`mailto:${socialMedia.Email}`} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <img width={20} height={20} src="/icons/gmail.png" alt="gmail" style={{ display: "inline-block" }} />
+                  <span style={{ color: "var(--text-tertiary)", fontSize: 16 }}>{socialMedia.Email}</span>
+                </a>
+              )}
             </div>
           )}
         </div>

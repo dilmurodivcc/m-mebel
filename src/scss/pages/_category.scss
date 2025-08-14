@@ -19,13 +19,18 @@
 }
 .category-filter-panel {
   display: flex;
-  align-items: center;
   gap: 24px;
   margin-bottom: 32px;
+  justify-content: space-between;
+  align-items: start;
 }
 .category-filter-btns {
   display: flex;
   gap: 12px;
+  width: 65%;
+  flex-wrap: wrap; 
+ 
+
 }
 .category-btn {
   background: var(--bg-secondary);
@@ -43,6 +48,11 @@
   line-height: 150%;
   color: var(--text);
   transition: background 0.2s, color 0.2s;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .category-btn-active {
   background: var(--bg-tertiary);
@@ -63,6 +73,8 @@
 .category-btn-all {
   background: var(--bg-secondary);
   color: var(--text);
+  line-height: 1;
+
 }
 .category-btn-all.category-btn-active {
   background: var(--bg-tertiary);
