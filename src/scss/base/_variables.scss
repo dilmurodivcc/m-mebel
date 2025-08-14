@@ -16,7 +16,7 @@
   --font-secondary: "Playwrite AU QLD", cursive;
 }
 // dark mode
-.dark {
+[data-theme="dark"] {
   --black: #fff;
   --white: #000;
   --bg: #211912;

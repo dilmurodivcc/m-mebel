@@ -20,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import {
   useGetProducts,
   useGetProductsByCategorySlug,
+  useGetProductsByCategoryIds,
 } from "@/hooks/getProducts";
 import { useGetCategories } from "@/hooks/getCategories";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -29,7 +30,8 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 
-const PRODUCTS_PER_PAGE = 8;
+const PRODUCTS_PER_PAGE_GRID = 18;
+const PRODUCTS_PER_PAGE_LIST = 10;
 
 const sortOptions = [
   { value: "asc", label: "priceLowToHigh" },
@@ -157,14 +159,15 @@ const Category = () => {
 
   // Store state
   const selectedCategory = useCategoryStore((s) => s.selectedCategory);
+  const selectedCategories = useCategoryStore((s) => s.selectedCategories);
+  const setSelectedCategories = useCategoryStore(
+    (s) => s.setSelectedCategories
+  );
   const layout = useCategoryStore((s) => s.layout);
   const setLayout = useCategoryStore((s) => s.setLayout);
   const currentPage = useCategoryStore((s) => s.currentPage);
   const setCurrentPage = useCategoryStore((s) => s.setCurrentPage);
   const setSelectedCategory = useCategoryStore((s) => s.setSelectedCategory);
-
-  // Local state
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange] = useState<{ min: string; max: string }>({
     min: "",
     max: "",
@@ -186,6 +189,22 @@ const Category = () => {
 
   // Get data from API
   const categories = categoriesData?.data || [];
+
+  // Get category IDs for selected categories
+  const selectedCategoryIds = useMemo(() => {
+    return selectedCategories
+      .map((catName) => {
+        const category = categories.find((c) => c.name === catName);
+        return category?.id;
+      })
+      .filter((id) => id !== undefined) as number[];
+  }, [selectedCategories, categories]);
+
+  // Hook for multiple category products
+  const {
+    data: productsByMultipleCategoriesData,
+    loading: multipleCategoriesLoading,
+  } = useGetProductsByCategoryIds(selectedCategoryIds);
   const productsByCategory = productsByCategoryData?.data || [];
   const allProducts = allProductsData?.data || [];
 
@@ -194,8 +213,13 @@ const Category = () => {
   console.log("Category slug from URL:", categorySlug);
   console.log("Categories from API:", categories);
   console.log("Products by category:", productsByCategory?.length || 0);
+  console.log(
+    "Products by multiple categories:",
+    productsByMultipleCategoriesData?.data?.length || 0
+  );
   console.log("All products count:", allProducts.length);
   console.log("Selected categories:", selectedCategories);
+  console.log("Selected category IDs:", selectedCategoryIds);
   console.log("Selected category from store:", selectedCategory);
   console.log(
     "API Base URL from environment:",
@@ -226,14 +250,7 @@ const Category = () => {
       setSelectedCategory("");
       setSelectedCategories([]);
     }
-  }, [categorySlug, categories, setSelectedCategory]);
-
-  // Sync store state with local state
-  useEffect(() => {
-    if (selectedCategory && !selectedCategories.includes(selectedCategory)) {
-      setSelectedCategories([selectedCategory]);
-    }
-  }, [selectedCategory, selectedCategories]);
+  }, [categorySlug, categories, setSelectedCategory, setSelectedCategories]);
 
   // Click outside handler for dropdown
   useEffect(() => {
@@ -259,9 +276,25 @@ const Category = () => {
     console.log("Category slug:", categorySlug);
     console.log("Category products count:", productsByCategory.length);
     console.log("Selected categories:", selectedCategories);
+    console.log("Selected category IDs:", selectedCategoryIds);
 
-    // If we have a category slug and products from that category API, use them
-    if (categorySlug && productsByCategory.length > 0) {
+    // If we have multiple selected categories, use API data
+    if (selectedCategories.length > 1) {
+      const multipleCategoriesProducts =
+        productsByMultipleCategoriesData?.data || [];
+      console.log(
+        "Using API products from multiple categories:",
+        multipleCategoriesProducts.length
+      );
+      return multipleCategoriesProducts;
+    }
+
+    // If we have a single category slug and products from that category API, use them
+    if (
+      categorySlug &&
+      productsByCategory.length > 0 &&
+      selectedCategories.length === 1
+    ) {
       console.log(
         "Using category-specific products:",
         productsByCategory.length
@@ -270,20 +303,15 @@ const Category = () => {
     }
 
     // If we have selected categories but no category slug (fallback filtering)
-    if (selectedCategories.length > 0) {
-      console.log("Filtering by selected categories:", selectedCategories);
-      const filtered = allProducts.filter((product: ProductForCard) =>
-        selectedCategories.some((cat) => {
-          // Try to match by material first, then by category name
-          const materialMatch = product.material === cat;
-          // Note: category field might not exist in ProductForCard type
-          // const categoryMatch = product.category?.name === cat;
-          console.log(
-            `Product ${product.title}: material=${product.material}, looking for=${cat}, matches=${materialMatch}`
-          );
-          return materialMatch;
-        })
-      );
+    if (selectedCategories.length === 1) {
+      console.log("Filtering by single selected category:", selectedCategories);
+      const filtered = allProducts.filter((product: ProductForCard) => {
+        const materialMatch = product.material === selectedCategories[0];
+        console.log(
+          `Product ${product.title}: material=${product.material}, looking for=${selectedCategories[0]}, matches=${materialMatch}`
+        );
+        return materialMatch;
+      });
       console.log("Using filtered products:", filtered.length);
       return filtered;
     }
@@ -291,7 +319,14 @@ const Category = () => {
     // Show all products if no category is selected
     console.log("Using all products:", allProducts.length);
     return allProducts;
-  }, [categorySlug, productsByCategory, selectedCategories, allProducts]);
+  }, [
+    categorySlug,
+    productsByCategory,
+    selectedCategories,
+    selectedCategoryIds,
+    productsByMultipleCategoriesData,
+    allProducts,
+  ]);
 
   // Memoized category options
   const categoryOptions = useMemo(
@@ -315,10 +350,10 @@ const Category = () => {
     );
 
     // Pagination
-    const total = Math.ceil(sorted.length / PRODUCTS_PER_PAGE);
+    const total = Math.ceil(sorted.length / PRODUCTS_PER_PAGE_GRID);
     const paginated = sorted.slice(
-      (currentPage - 1) * PRODUCTS_PER_PAGE,
-      currentPage * PRODUCTS_PER_PAGE
+      (currentPage - 1) * PRODUCTS_PER_PAGE_GRID,
+      currentPage * PRODUCTS_PER_PAGE_GRID
     );
 
     console.log("Final products:", {
@@ -334,7 +369,6 @@ const Category = () => {
     };
   }, [products, priceRange, sortOrder, currentPage]);
 
-  // Optimized category click handler
   const handleCategoryClick = useCallback(
     (cat: string) => {
       console.log("Category clicked:", cat);
@@ -353,14 +387,8 @@ const Category = () => {
           setSelectedCategory("");
           router.push("/category");
         } else {
-          setSelectedCategory(newCategories[0]);
-          // Update URL with the remaining category
-          const categoryObj = categories.find(
-            (c) => c.name === newCategories[0]
-          );
-          if (categoryObj) {
-            router.push(`/category?category=${categoryObj.slug}`);
-          }
+          // Keep multiple categories selected, don't update URL for multiple selection
+          setSelectedCategory(newCategories.join(", "));
         }
       } else {
         console.log("Adding category:", cat);
@@ -369,13 +397,18 @@ const Category = () => {
           cat,
         ];
         setSelectedCategories(newCategories);
-        setSelectedCategory(cat);
 
-        // Update URL with category slug
-        const categoryObj = categories.find((c) => c.name === cat);
-        if (categoryObj) {
-          console.log("Navigating to category:", categoryObj.slug);
-          router.push(`/category?category=${categoryObj.slug}`);
+        // Update selected category display
+        if (newCategories.length === 1) {
+          setSelectedCategory(cat);
+          // Update URL only for single category
+          const categoryObj = categories.find((c) => c.name === cat);
+          if (categoryObj) {
+            router.push(`/category?category=${categoryObj.slug}`);
+          }
+        } else {
+          // For multiple categories, don't update URL but show combined name
+          setSelectedCategory(newCategories.join(", "));
         }
       }
       setCurrentPage(1);
@@ -384,6 +417,7 @@ const Category = () => {
       selectedCategories,
       categories,
       setSelectedCategory,
+      setSelectedCategories,
       setCurrentPage,
       router,
       t,
@@ -401,11 +435,19 @@ const Category = () => {
         setSelectedCategory("");
         router.push("/category");
       } else {
-        setSelectedCategory(newCategories[0]);
-        // Update URL with the remaining category
-        const categoryObj = categories.find((c) => c.name === newCategories[0]);
-        if (categoryObj) {
-          router.push(`/category?category=${categoryObj.slug}`);
+        // Update selected category display
+        if (newCategories.length === 1) {
+          setSelectedCategory(newCategories[0]);
+          // Update URL with the remaining category
+          const categoryObj = categories.find(
+            (c) => c.name === newCategories[0]
+          );
+          if (categoryObj) {
+            router.push(`/category?category=${categoryObj.slug}`);
+          }
+        } else {
+          // For multiple categories, don't update URL but show combined name
+          setSelectedCategory(newCategories.join(", "));
         }
       }
 
@@ -415,13 +457,19 @@ const Category = () => {
       selectedCategories,
       categories,
       setSelectedCategory,
+      setSelectedCategories,
       setCurrentPage,
       router,
     ]
   );
 
   // Loading state
-  if (categoriesLoading || categoryProductsLoading || allProductsLoading) {
+  if (
+    categoriesLoading ||
+    categoryProductsLoading ||
+    allProductsLoading ||
+    multipleCategoriesLoading
+  ) {
     return (
       <ClientLayout showHeader={true} showFooter={true}>
         <main className="category-page">
@@ -454,12 +502,21 @@ const Category = () => {
         <nav className="breadcrumb">
           <span className="breadcrumb-main">{t("breadcrumbMain")}</span> /{" "}
           <span className="breadcrumb-current">
-            {selectedCategory ? t(selectedCategory) : t("breadcrumbCategory")}
+            {selectedCategories.length > 0
+              ? selectedCategories.length === 1
+                ? t(selectedCategories[0])
+                : `${selectedCategories.length} ${t("categories")}`
+              : t("breadcrumbCategory")}
           </span>
         </nav>
         <h1 className="category-title">
-          {selectedCategory ? t(selectedCategory) : t("breadcrumbCategory")}{" "}
-          {t("breadcrumbMain")}
+          {selectedCategories.length > 0
+            ? selectedCategories.length === 1
+              ? `${t(selectedCategories[0])} ${t("breadcrumbMain")}`
+              : `${selectedCategories.length} ${t("categories")} ${t(
+                  "breadcrumbMain"
+                )}`
+            : `${t("breadcrumbCategory")} ${t("breadcrumbMain")}`}
         </h1>
         <div className="category-filter-panel">
           <div className="category-filter-btns">
@@ -573,9 +630,16 @@ const Category = () => {
                 {products.length}
               </p>
               <p>Selected categories: {selectedCategories.join(", ")}</p>
+              <p>Selected category IDs: {selectedCategoryIds.join(", ")}</p>
               <p>
                 Category with products:{" "}
                 {productsByCategory.length > 0 ? "Yes" : "No"}
+              </p>
+              <p>
+                Multiple categories with products:{" "}
+                {(productsByMultipleCategoriesData?.data?.length || 0) > 0
+                  ? "Yes"
+                  : "No"}
               </p>
               <p>All products count: {allProducts.length}</p>
             </div>

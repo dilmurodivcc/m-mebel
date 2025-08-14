@@ -25,7 +25,6 @@ const ProductDetail = () => {
   const { data: productData, loading, error } = useGetProduct(documentId);
   const product = productData?.data;
 
-  // Memoize expensive translation operations
   const productNameKey = useMemo(() => product?.title, [product?.title]);
 
   const productDescriptionKey = useMemo(
@@ -35,9 +34,9 @@ const ProductDetail = () => {
 
   const handleContactClick = useCallback(() => {
     setShowContactInfo(!showContactInfo);
+
   }, [showContactInfo]);
 
-  // Loading state
   if (loading) {
     return (
       <ClientLayout showHeader={false} showFooter={false}>
@@ -50,7 +49,6 @@ const ProductDetail = () => {
     );
   }
 
-  // Error state
   if (error || !product) {
     return (
       <ClientLayout showHeader={false} showFooter={false}>

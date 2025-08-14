@@ -10,6 +10,7 @@ import { useGetProducts } from "@/hooks/getProducts";
 import { useGetCategories } from "@/hooks/getCategories";
 import { useGetSiteInfo } from "@/hooks/getGlobals";
 import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
+import { SkeletonGrid } from "@/components/ui/SkeletonLoader";
 
 // Extend Window interface for setNavigationLoading
 declare global {
@@ -83,9 +84,47 @@ export default function Home() {
     return (
       <ClientLayout showHeader={true} showFooter={true}>
         <main className="home-page">
-          <div style={{ textAlign: "center", padding: "50px" }}>
-            <h2>Loading...</h2>
-          </div>
+          <section className="hero-section">
+            <div className="hero-content fallback">
+              <div className="container">
+                <h1>{t("heroTitle")}</h1>
+                <p>{t("heroSubtitle")}</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="featured-collections">
+            <div className="container">
+              <h2>{t("featuredCollections")}</h2>
+              <div className="collections-grid">
+                <div className="skeleton-grid">
+                  <SkeletonGrid count={3} type="collection" />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="shop-category">
+            <div className="container">
+              <h2>{t("shopByCategory")}</h2>
+              <div className="category-grid">
+                <div className="skeleton-grid">
+                  <SkeletonGrid count={6} type="category" />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="new-arrivals">
+            <div className="container">
+              <h2>{t("newArrivals")}</h2>
+              <div className="collections-grid">
+                <div className="skeleton-grid">
+                  <SkeletonGrid count={3} type="collection" />
+                </div>
+              </div>
+            </div>
+          </section>
         </main>
       </ClientLayout>
     );
@@ -143,28 +182,34 @@ export default function Home() {
           <div className="container">
             <h2>{t("featuredCollections")}</h2>
             <div className="collections-grid">
-              {featuredProducts.map((product) => (
-                <Link
-                  key={product.id}
-                  href={`/product/${product.documentId}`}
-                  className="collection-card"
-                  onClick={handleProductClick}
-                  prefetch={true}
-                >
-                  <div className="card-image">
-                    <img
-                      src={getImageUrl(product.img?.url)}
-                      alt={product.title}
-                    />
-                  </div>
-                  <div className="card-content">
-                    <h3>{product.title}</h3>
-                    <p className="product-price">
-                      {formatPriceNumber(product.price)}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+              {productsLoading ? (
+                <div className="skeleton-grid">
+                  <SkeletonGrid count={3} type="collection" />
+                </div>
+              ) : (
+                featuredProducts.map((product) => (
+                  <Link
+                    key={product.id}
+                    href={`/product/${product.documentId}`}
+                    className="collection-card"
+                    onClick={handleProductClick}
+                    prefetch={true}
+                  >
+                    <div className="card-image">
+                      <img
+                        src={getImageUrl(product.img?.url)}
+                        alt={product.title}
+                      />
+                    </div>
+                    <div className="card-content">
+                      <h3>{product.title}</h3>
+                      <p className="product-price">
+                        {formatPriceNumber(product.price)}
+                      </p>
+                    </div>
+                  </Link>
+                ))
+              )}
             </div>
           </div>
         </section>
@@ -173,21 +218,27 @@ export default function Home() {
           <div className="container">
             <h2>{t("shopByCategory")}</h2>
             <div className="category-grid">
-              {categories.map((category) => (
-                <Link
-                  href={`/category?category=${category.slug}`}
-                  key={category.id}
-                  className="category-card"
-                >
-                  <div className="category-image">
-                    <img
-                      src={getImageUrl(category.image?.url)}
-                      alt={category.name}
-                    />
-                  </div>
-                  <h3>{category.name}</h3>
-                </Link>
-              ))}
+              {categoriesLoading ? (
+                <div className="skeleton-grid">
+                  <SkeletonGrid count={6} type="category" />
+                </div>
+              ) : (
+                categories.map((category) => (
+                  <Link
+                    href={`/category?category=${category.slug}`}
+                    key={category.id}
+                    className="category-card"
+                  >
+                    <div className="category-image">
+                      <img
+                        src={getImageUrl(category.image?.url)}
+                        alt={category.name}
+                      />
+                    </div>
+                    <h3>{category.name}</h3>
+                  </Link>
+                ))
+              )}
             </div>
           </div>
         </section>
@@ -196,28 +247,34 @@ export default function Home() {
           <div className="container">
             <h2>{t("newArrivals")}</h2>
             <div className="collections-grid">
-              {newArrivalsProducts.map((product) => (
-                <Link
-                  key={product.id}
-                  href={`/product/${product.documentId}`}
-                  className="collection-card"
-                  onClick={handleProductClick}
-                  prefetch={true}
-                >
-                  <div className="card-image">
-                    <img
-                      src={getImageUrl(product.img?.url)}
-                      alt={product.title}
-                    />
-                  </div>
-                  <div className="card-content">
-                    <h3>{product.title}</h3>
-                    <p className="product-price">
-                      {formatPriceNumber(product.price)}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+              {productsLoading ? (
+                <div className="skeleton-grid">
+                  <SkeletonGrid count={3} type="collection" />
+                </div>
+              ) : (
+                newArrivalsProducts.map((product) => (
+                  <Link
+                    key={product.id}
+                    href={`/product/${product.documentId}`}
+                    className="collection-card"
+                    onClick={handleProductClick}
+                    prefetch={true}
+                  >
+                    <div className="card-image">
+                      <img
+                        src={getImageUrl(product.img?.url)}
+                        alt={product.title}
+                      />
+                    </div>
+                    <div className="card-content">
+                      <h3>{product.title}</h3>
+                      <p className="product-price">
+                        {formatPriceNumber(product.price)}
+                      </p>
+                    </div>
+                  </Link>
+                ))
+              )}
             </div>
           </div>
         </section>

@@ -29,7 +29,8 @@ API.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error("API Request Error:", error);
+    // Use console.warn instead of console.error to avoid Next.js error handling
+    console.warn("API Request Error:", error);
     return Promise.reject(error);
   }
 );
@@ -44,9 +45,10 @@ API.interceptors.response.use(
     const data = error.response?.data;
     const code = error.code;
     const message = error.message;
-    console.error("API Response Error:", status, data);
+    // Use console.warn instead of console.error to avoid Next.js error handling
+    console.warn("API Response Error:", status, data);
     if (code === "ECONNABORTED") {
-      console.error("Axios timeout/aborted request:", message);
+      console.warn("Axios timeout/aborted request:", message);
     }
     return Promise.reject(error);
   }

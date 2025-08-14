@@ -133,7 +133,7 @@ export const useGetCategories = () => {
       } catch (error: unknown) {
         if (!isMounted) return;
 
-        console.error("Error fetching categories:", error);
+        console.warn("Error fetching categories:", error);
         const maybe = error as {
           message?: string;
           response?: { data?: { message?: string } };
@@ -306,7 +306,7 @@ export const useGetCategoryWithProducts = (slug: string) => {
         return;
       }
 
-          const now = Date.now();
+      const now = Date.now();
       if (data && now - lastFetch < 5 * 60 * 1000) {
         setLoading(false);
         return;
@@ -342,7 +342,7 @@ export const useGetCategoryWithProducts = (slug: string) => {
       } catch (error: unknown) {
         if (!isMounted) return;
 
-        console.error("Error fetching category with products:", error);
+        console.warn("Error fetching category with products:", error);
         const maybe = error as {
           message?: string;
           response?: { data?: { message?: string } };

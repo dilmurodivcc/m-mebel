@@ -159,7 +159,7 @@ export const useGetProducts = () => {
       } catch (error: unknown) {
         if (!isMounted) return;
 
-        console.error("Error fetching products:", error);
+        console.warn("Error fetching products:", error);
         const maybe = error as {
           message?: string;
           response?: { data?: { message?: string } };
@@ -207,7 +207,7 @@ export const useGetProduct = (documentId: string) => {
         const response = await fetchWithCache(
           `product:${documentId}`,
           () =>
-            API.get(`/api/products/${documentId}?populate=img,SizesOfProduct`, {
+            API.get(`/api/products/${documentId}?populate=*`, {
               signal: controller.signal,
             }).then((r) => r),
           5 * 60 * 1000
@@ -215,7 +215,7 @@ export const useGetProduct = (documentId: string) => {
         console.log("Product response:", response.data);
         setData(response.data);
       } catch (error: unknown) {
-        console.error("Error fetching product:", error);
+        console.warn("Error fetching product:", error);
         const maybe = error as {
           message?: string;
           response?: { data?: { message?: string } };
@@ -366,6 +366,61 @@ export const useGetProductsByCategorySlug = (categorySlug: string) => {
     fetchProducts();
     return () => controller.abort();
   }, [categorySlug]);
+
+  return { data, loading, error };
+};
+
+export const useGetProductsByCategoryIds = (categoryIds: number[]) => {
+  const [data, setData] = useState<ProductsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const fetchProducts = async () => {
+      if (!categoryIds || categoryIds.length === 0) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Build URL with multiple category IDs using $in operator with array format
+        const categoryFilters = categoryIds
+          .map((id, index) => `filters[category][id][$in][${index}]=${id}`)
+          .join("&");
+        const url = `/api/products?${categoryFilters}&populate=img`;
+
+        console.log("Fetching products by category IDs:", categoryIds);
+        console.log("URL:", url);
+
+        const response = await fetchWithCache(
+          `products-by-category-ids:${categoryIds.join(",")}`,
+          () => API.get(url, { signal: controller.signal }).then((r) => r),
+          5 * 60 * 1000
+        );
+        setData(response.data);
+      } catch (error: unknown) {
+        const errorMessage =
+          (
+            error as {
+              response?: { data?: { message?: string } };
+              message?: string;
+            }
+          ).response?.data?.message ||
+          (error as { message?: string }).message ||
+          "Failed to fetch products by category IDs";
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+    return () => controller.abort();
+  }, [categoryIds]);
 
   return { data, loading, error };
 };

@@ -126,7 +126,7 @@ export const useGetGlobals = () => {
       } catch (error: unknown) {
         if (!isMounted) return;
 
-        console.error("Error fetching globals:", error);
+        console.warn("Error fetching globals:", error);
         const maybe = error as {
           message?: string;
           response?: { data?: { message?: string } };

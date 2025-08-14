@@ -28,9 +28,9 @@
   display: flex;
   gap: 12px;
   width: 65%;
-  flex-wrap: wrap; 
- 
-
+  flex-wrap: wrap;
+  min-height: 40px;
+  align-items: center;
 }
 .category-btn {
   background: var(--bg-secondary);
@@ -74,7 +74,6 @@
   background: var(--bg-secondary);
   color: var(--text);
   line-height: 1;
-
 }
 .category-btn-all.category-btn-active {
   background: var(--bg-tertiary);
@@ -285,6 +284,23 @@
 }
 
 @media (max-width: 768px) {
+  .category-filter-panel {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .category-filter-btns {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .category-btn {
+    font-size: 12px;
+    padding: 4px 12px;
+  }
+
   .category-product-card.list {
     flex-direction: column;
     align-items: flex-start;

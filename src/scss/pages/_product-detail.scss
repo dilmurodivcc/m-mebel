@@ -55,12 +55,15 @@
   grid-template-columns: 1fr 1fr;
   gap: 48px;
   margin-top: 32px;
+  position: relative;
 }
 
 .product-images {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  position: sticky;
+  top: 0px;
 }
 
 .main-image {
