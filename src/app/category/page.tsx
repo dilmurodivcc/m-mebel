@@ -1,7 +1,13 @@
 "use client";
 
 import ClientLayout from "@/components/layout/ClientLayout";
-import React, { useState, useRef, useEffect } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
 import { useCategoryStore } from "./store";
 import {
   MdKeyboardArrowDown,
@@ -10,24 +16,20 @@ import {
 } from "react-icons/md";
 import { CiGrid41 } from "react-icons/ci";
 import { BsList } from "react-icons/bs";
-import { products } from "@/data/products";
 import { useTranslation } from "react-i18next";
+import {
+  useGetProducts,
+  useGetProductsByCategorySlug,
+} from "@/hooks/getProducts";
+import { useGetCategories } from "@/hooks/getCategories";
+import { useSearchParams, useRouter } from "next/navigation";
+import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
 
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 
-const mockProducts = products;
-
 const PRODUCTS_PER_PAGE = 8;
-
-const categoryOptions = [
-  "sofas",
-  "coffeeTables",
-  "endTables",
-  "tvStands",
-  "armchairs",
-];
 
 const sortOptions = [
   { value: "asc", label: "priceLowToHigh" },
@@ -65,14 +67,103 @@ function getPagination(current: number, total: number) {
   return rangeWithDots;
 }
 
+// Memoized category button component
+const CategoryButton = React.memo(
+  ({
+    cat,
+    isSelected,
+    onClick,
+    onRemove,
+  }: {
+    cat: string;
+    isSelected: boolean;
+    onClick: () => void;
+    onRemove: () => void;
+  }) => (
+    <button
+      onClick={onClick}
+      className={`category-btn${isSelected ? " category-btn-active" : ""}`}
+    >
+      {cat}
+      {isSelected && (
+        <span
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+          className="category-btn-remove"
+        >
+          ×
+        </span>
+      )}
+    </button>
+  )
+);
+CategoryButton.displayName = "CategoryButton";
+
+// Memoized product card component
+type ProductForCard = {
+  id: number;
+  documentId: string;
+  title: string;
+  description?: string;
+  price: number;
+  material?: string;
+  img?: { url?: string };
+};
+
+const ProductCard = React.memo(
+  ({
+    product,
+    layout,
+  }: {
+    product: ProductForCard;
+    layout: "grid" | "list";
+  }) => (
+    <Link
+      href={`/product/${product.documentId}`}
+      className={`product-card category-product-card${
+        layout === "grid" ? " grid" : " list"
+      }`}
+      prefetch={true}
+    >
+      <img
+        src={getImageUrl(product.img?.url)}
+        alt={product.title}
+        className={`category-product-img${
+          layout === "grid" ? " grid" : " list"
+        }`}
+      />
+      <div className="category-product-content">
+        <div className="category-product-name">{product.title}</div>
+        {layout === "list" && (
+          <div className="category-product-description">
+            {product.description}
+          </div>
+        )}
+        <div className="category-product-price">
+          {formatPriceNumber(product.price)}
+        </div>
+      </div>
+    </Link>
+  )
+);
+ProductCard.displayName = "ProductCard";
+
 const Category = () => {
   const { t } = useTranslation();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Store state
   const selectedCategory = useCategoryStore((s) => s.selectedCategory);
   const layout = useCategoryStore((s) => s.layout);
   const setLayout = useCategoryStore((s) => s.setLayout);
   const currentPage = useCategoryStore((s) => s.currentPage);
   const setCurrentPage = useCategoryStore((s) => s.setCurrentPage);
+  const setSelectedCategory = useCategoryStore((s) => s.setSelectedCategory);
 
+  // Local state
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange] = useState<{ min: string; max: string }>({
     min: "",
@@ -82,14 +173,70 @@ const Category = () => {
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Auto-select category from header
+  // Get category slug from URL
+  const categorySlug = searchParams.get("category");
+
+  // API hooks
+  const { data: categoriesData, loading: categoriesLoading } =
+    useGetCategories();
+  const { data: productsByCategoryData, loading: categoryProductsLoading } =
+    useGetProductsByCategorySlug(categorySlug || "");
+  const { data: allProductsData, loading: allProductsLoading } =
+    useGetProducts();
+
+  // Get data from API
+  const categories = categoriesData?.data || [];
+  const productsByCategory = productsByCategoryData?.data || [];
+  const allProducts = allProductsData?.data || [];
+
+  // Debug logging
+  console.log("=== CATEGORY PAGE DEBUG ===");
+  console.log("Category slug from URL:", categorySlug);
+  console.log("Categories from API:", categories);
+  console.log("Products by category:", productsByCategory?.length || 0);
+  console.log("All products count:", allProducts.length);
+  console.log("Selected categories:", selectedCategories);
+  console.log("Selected category from store:", selectedCategory);
+  console.log(
+    "API Base URL from environment:",
+    process.env.NEXT_PUBLIC_API_URL
+  );
+
+  // Sync URL params with store state
   useEffect(() => {
-    if (selectedCategory && selectedCategories.length === 0) {
+    console.log("=== URL SYNC EFFECT ===");
+    console.log("Category slug:", categorySlug);
+    console.log(
+      "Available categories:",
+      categories.map((c) => ({ name: c.name, slug: c.slug }))
+    );
+
+    if (categorySlug) {
+      const category = categories.find((cat) => cat.slug === categorySlug);
+      if (category) {
+        console.log("Found category from slug:", category.name);
+        setSelectedCategory(category.name);
+        setSelectedCategories([category.name]);
+      } else {
+        console.log("Category not found for slug:", categorySlug);
+      }
+    } else {
+      // Clear category selection when no slug in URL
+      console.log("No category slug, clearing selection");
+      setSelectedCategory("");
+      setSelectedCategories([]);
+    }
+  }, [categorySlug, categories, setSelectedCategory]);
+
+  // Sync store state with local state
+  useEffect(() => {
+    if (selectedCategory && !selectedCategories.includes(selectedCategory)) {
       setSelectedCategories([selectedCategory]);
     }
   }, [selectedCategory, selectedCategories]);
 
-  React.useEffect(() => {
+  // Click outside handler for dropdown
+  useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
         sortDropdownRef.current &&
@@ -98,55 +245,209 @@ const Category = () => {
         setSortDropdownOpen(false);
       }
     }
+
     if (sortDropdownOpen) {
       document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
   }, [sortDropdownOpen]);
 
-  const filteredProducts = mockProducts.filter((product) => {
-    const categoryMatch =
-      selectedCategories.length === 0 ||
-      selectedCategories.includes(t("allCategories")) ||
-      selectedCategories.some((cat) => product.category === cat);
-    const min = priceRange.min ? parseInt(priceRange.min) : 0;
-    const max = priceRange.max ? parseInt(priceRange.max) : Infinity;
-    const priceMatch = product.price >= min && product.price <= max;
-    return categoryMatch && priceMatch;
-  });
+  // Determine which products to use based on category selection
+  const products = useMemo(() => {
+    console.log("=== PRODUCT FILTERING ===");
+    console.log("Category slug:", categorySlug);
+    console.log("Category products count:", productsByCategory.length);
+    console.log("Selected categories:", selectedCategories);
 
-  const sortedProducts = [...filteredProducts].sort((a, b) =>
-    sortOrder === "asc" ? a.price - b.price : b.price - a.price
-  );
-
-  const totalPages = Math.ceil(sortedProducts.length / PRODUCTS_PER_PAGE);
-  const paginatedProducts = sortedProducts.slice(
-    (currentPage - 1) * PRODUCTS_PER_PAGE,
-    currentPage * PRODUCTS_PER_PAGE
-  );
-
-  const handleCategoryClick = (cat: string) => {
-    if (cat === t("allCategories")) {
-      setSelectedCategories([]);
-      useCategoryStore.getState().setSelectedCategory("");
-    } else if (selectedCategories.includes(cat)) {
-      setSelectedCategories(selectedCategories.filter((c) => c !== cat));
-    } else {
-      setSelectedCategories([
-        ...selectedCategories.filter((c) => c !== t("allCategories")),
-        cat,
-      ]);
+    // If we have a category slug and products from that category API, use them
+    if (categorySlug && productsByCategory.length > 0) {
+      console.log(
+        "Using category-specific products:",
+        productsByCategory.length
+      );
+      return productsByCategory;
     }
-    setCurrentPage(1);
-  };
-  const handleRemoveCategory = (cat: string) => {
-    setSelectedCategories(selectedCategories.filter((c) => c !== cat));
-    setCurrentPage(1);
-  };
+
+    // If we have selected categories but no category slug (fallback filtering)
+    if (selectedCategories.length > 0) {
+      console.log("Filtering by selected categories:", selectedCategories);
+      const filtered = allProducts.filter((product: ProductForCard) =>
+        selectedCategories.some((cat) => {
+          // Try to match by material first, then by category name
+          const materialMatch = product.material === cat;
+          // Note: category field might not exist in ProductForCard type
+          // const categoryMatch = product.category?.name === cat;
+          console.log(
+            `Product ${product.title}: material=${product.material}, looking for=${cat}, matches=${materialMatch}`
+          );
+          return materialMatch;
+        })
+      );
+      console.log("Using filtered products:", filtered.length);
+      return filtered;
+    }
+
+    // Show all products if no category is selected
+    console.log("Using all products:", allProducts.length);
+    return allProducts;
+  }, [categorySlug, productsByCategory, selectedCategories, allProducts]);
+
+  // Memoized category options
+  const categoryOptions = useMemo(
+    () => categories.map((cat) => cat.name),
+    [categories]
+  );
+
+  // Memoized filtered and sorted products
+  const { totalPages, paginatedProducts } =
+    useMemo(() => {
+      // Since products are now pre-filtered by API, we only need to apply price filtering
+      const filtered = products.filter((product: ProductForCard) => {
+        const min = priceRange.min ? parseInt(priceRange.min) : 0;
+        const max = priceRange.max ? parseInt(priceRange.max) : Infinity;
+        const priceMatch = product.price >= min && product.price <= max;
+        return priceMatch;
+      });
+
+      // Sort products
+      const sorted = [...filtered].sort((a, b) =>
+        sortOrder === "asc" ? a.price - b.price : b.price - a.price
+      );
+
+      // Pagination
+      const total = Math.ceil(sorted.length / PRODUCTS_PER_PAGE);
+      const paginated = sorted.slice(
+        (currentPage - 1) * PRODUCTS_PER_PAGE,
+        currentPage * PRODUCTS_PER_PAGE
+      );
+
+      console.log("Final products:", {
+        filtered: filtered.length,
+        sorted: sorted.length,
+        paginated: paginated.length,
+        totalPages: total,
+      });
+
+      return {
+        totalPages: total,
+        paginatedProducts: paginated,
+      };
+    }, [products, priceRange, sortOrder, currentPage]);
+
+  // Optimized category click handler
+  const handleCategoryClick = useCallback(
+    (cat: string) => {
+      console.log("Category clicked:", cat);
+
+      if (cat === t("allCategories")) {
+        console.log("All categories clicked, clearing selection");
+        setSelectedCategories([]);
+        setSelectedCategory("");
+        router.push("/category");
+      } else if (selectedCategories.includes(cat)) {
+        console.log("Removing category:", cat);
+        const newCategories = selectedCategories.filter((c) => c !== cat);
+        setSelectedCategories(newCategories);
+
+        if (newCategories.length === 0) {
+          setSelectedCategory("");
+          router.push("/category");
+        } else {
+          setSelectedCategory(newCategories[0]);
+          // Update URL with the remaining category
+          const categoryObj = categories.find(
+            (c) => c.name === newCategories[0]
+          );
+          if (categoryObj) {
+            router.push(`/category?category=${categoryObj.slug}`);
+          }
+        }
+      } else {
+        console.log("Adding category:", cat);
+        const newCategories = [
+          ...selectedCategories.filter((c) => c !== t("allCategories")),
+          cat,
+        ];
+        setSelectedCategories(newCategories);
+        setSelectedCategory(cat);
+
+        // Update URL with category slug
+        const categoryObj = categories.find((c) => c.name === cat);
+        if (categoryObj) {
+          console.log("Navigating to category:", categoryObj.slug);
+          router.push(`/category?category=${categoryObj.slug}`);
+        }
+      }
+      setCurrentPage(1);
+    },
+    [
+      selectedCategories,
+      categories,
+      setSelectedCategory,
+      setCurrentPage,
+      router,
+      t,
+    ]
+  );
+
+  // Optimized remove category handler
+  const handleRemoveCategory = useCallback(
+    (cat: string) => {
+      console.log("Removing category:", cat);
+      const newCategories = selectedCategories.filter((c) => c !== cat);
+      setSelectedCategories(newCategories);
+
+      if (newCategories.length === 0) {
+        setSelectedCategory("");
+        router.push("/category");
+      } else {
+        setSelectedCategory(newCategories[0]);
+        // Update URL with the remaining category
+        const categoryObj = categories.find((c) => c.name === newCategories[0]);
+        if (categoryObj) {
+          router.push(`/category?category=${categoryObj.slug}`);
+        }
+      }
+
+      setCurrentPage(1);
+    },
+    [
+      selectedCategories,
+      categories,
+      setSelectedCategory,
+      setCurrentPage,
+      router,
+    ]
+  );
+
+  // Loading state
+  if (categoriesLoading || categoryProductsLoading || allProductsLoading) {
+    return (
+      <ClientLayout showHeader={true} showFooter={true}>
+        <main className="category-page">
+          <div style={{ textAlign: "center", padding: "50px" }}>
+            <h2>Loading category...</h2>
+            {categorySlug && <p>Loading products for {categorySlug}</p>}
+          </div>
+        </main>
+      </ClientLayout>
+    );
+  }
+
+  // Error state
+  if (!categories.length) {
+    return (
+      <ClientLayout showHeader={true} showFooter={true}>
+        <main className="category-page">
+          <div style={{ textAlign: "center", padding: "50px" }}>
+            <h2>No categories found</h2>
+            <button onClick={() => window.location.reload()}>Retry</button>
+          </div>
+        </main>
+      </ClientLayout>
+    );
+  }
 
   return (
     <ClientLayout showHeader={true} showFooter={true}>
@@ -170,26 +471,13 @@ const Category = () => {
               {t("allCategories")}
             </button>
             {categoryOptions.map((cat) => (
-              <button
+              <CategoryButton
                 key={cat}
+                cat={cat}
+                isSelected={selectedCategories.includes(cat)}
                 onClick={() => handleCategoryClick(cat)}
-                className={`category-btn${
-                  selectedCategories.includes(cat) ? " category-btn-active" : ""
-                }`}
-              >
-                {t(cat)}
-                {selectedCategories.includes(cat) && (
-                  <span
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveCategory(cat);
-                    }}
-                    className="category-btn-remove"
-                  >
-                    ×
-                  </span>
-                )}
-              </button>
+                onRemove={() => handleRemoveCategory(cat)}
+              />
             ))}
           </div>
           <div className="category-price-filter">
@@ -260,37 +548,43 @@ const Category = () => {
               : "products-list category-products-list"
           }
         >
-          {paginatedProducts.map((product) => (
-            <Link
-              href={`/product/${product.id}`}
-              key={product.id}
-              className={`product-card category-product-card${
-                layout === "grid" ? " grid" : " list"
-              }`}
-              prefetch={true}
+          {categoryProductsLoading && categorySlug ? (
+            <div
+              style={{
+                gridColumn: "1 / -1",
+                textAlign: "center",
+                padding: "40px",
+                color: "var(--text-tertiary)",
+              }}
             >
-              <img
-                src={product.image}
-                alt={product.name}
-                className={`category-product-img${
-                  layout === "grid" ? " grid" : " list"
-                }`}
-              />
-              <div className="category-product-content">
-                <div className="category-product-name">
-                  {t(product.name.toLowerCase().replace(/\s+/g, ""))}
-                </div>
-                {layout === "list" && (
-                  <div className="category-product-description">
-                    {t(product.description.toLowerCase().replace(/\s+/g, ""))}
-                  </div>
-                )}
-                <div className="category-product-price">
-                  ${product.price.toLocaleString()}
-                </div>
-              </div>
-            </Link>
-          ))}
+              <p>Loading products for {categorySlug}...</p>
+            </div>
+          ) : paginatedProducts.length === 0 ? (
+            <div
+              style={{
+                gridColumn: "1 / -1",
+                textAlign: "center",
+                padding: "40px",
+                color: "var(--text-tertiary)",
+              }}
+            >
+              <p>No products found in this category.</p>
+              <p>
+                Debug info: Category slug: {categorySlug}, Products count:{" "}
+                {products.length}
+              </p>
+              <p>Selected categories: {selectedCategories.join(", ")}</p>
+              <p>
+                Category with products:{" "}
+                {productsByCategory.length > 0 ? "Yes" : "No"}
+              </p>
+              <p>All products count: {allProducts.length}</p>
+            </div>
+          ) : (
+            paginatedProducts.map((product) => (
+              <ProductCard key={product.id} product={product} layout={layout} />
+            ))
+          )}
         </div>
         <div className="category-pagination">
           <button

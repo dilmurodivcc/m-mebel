@@ -1,30 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { LuSunMedium, LuMoon } from "react-icons/lu";
 import { useCategoryStore } from "@/app/category/store";
 import type { CategoryState } from "@/app/category/store";
 import { useThemeStore } from "@/app/theme/store";
 import { useRouter, usePathname } from "next/navigation";
-import { products, type Product } from "@/data/products";
 import { useTranslation } from "react-i18next";
 import LanguageChanger from "../ui/LanguageChanger";
-
-const categories = [
-  { name: "sofas" },
-  { name: "coffeeTables" },
-  { name: "endTables" },
-  { name: "tvStands" },
-  { name: "armchairs" },
-];
+import { useGetCategories } from "@/hooks/getCategories";
+import { useGetProducts } from "@/hooks/getProducts";
+import { useGetSiteInfo } from "@/hooks/getGlobals";
+import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
 
 const Header = () => {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useThemeStore();
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<Product[]>([]);
+  type SearchProduct = {
+    id: number;
+    documentId?: string;
+    title?: string;
+    material?: string;
+    price?: number;
+    img?: { url?: string };
+  };
+  const [searchResults, setSearchResults] = useState<SearchProduct[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const selectedCategory = useCategoryStore(
     (state: CategoryState) => state.selectedCategory
@@ -36,43 +39,92 @@ const Header = () => {
   const pathname = usePathname();
   const isHomePage = pathname === "/";
 
+  // API hooks
+  const {
+    data: categoriesData,
+    loading: categoriesLoading,
+  } = useGetCategories();
+  const {
+    data: productsData,
+    loading: productsLoading,
+  } = useGetProducts();
+  const {
+    siteName,
+    favicon,
+    loading: siteInfoLoading,
+  } = useGetSiteInfo();
+
+  // Get data from API with safe fallbacks
+  const categories = useMemo(
+    () => categoriesData?.data || [],
+    [categoriesData]
+  );
+  const products = useMemo(() => productsData?.data || [], [productsData]);
+
+  // Memoized search results to prevent unnecessary recalculations
+  const filteredSearchResults = useMemo(() => {
+    if (
+      !searchQuery.trim() ||
+      !products ||
+      !Array.isArray(products) ||
+      !products.length
+    ) {
+      return [];
+    }
+
+    return products
+      .filter(
+        (product) =>
+          product?.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product?.material?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      .slice(0, 5);
+  }, [searchQuery, products]);
+
+  // Update search results when filtered results change
   useEffect(() => {
     if (searchQuery.trim().length > 0) {
-      const filtered = products.filter(
-        (product) =>
-          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.category.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setSearchResults(filtered.slice(0, 5));
+      setSearchResults(filteredSearchResults);
       setShowSearchResults(true);
     } else {
       setSearchResults([]);
       setShowSearchResults(false);
     }
-  }, [searchQuery]);
+  }, [filteredSearchResults, searchQuery]);
 
-  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
+  const handleSearchInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchQuery(e.target.value);
+    },
+    []
+  );
 
-  const handleSearchResultClick = (productId: number) => {
-    setSearchQuery("");
-    setShowSearchResults(false);
-    router.push(`/product/${productId}`);
-  };
+  const handleSearchResultClick = useCallback(
+    (documentId: string) => {
+      if (!documentId) {
+        console.error("Invalid documentId:", documentId);
+        return;
+      }
+      setSearchQuery("");
+      setShowSearchResults(false);
+      router.push(`/product/${documentId}`);
+    },
+    [router]
+  );
 
-  const handleSearchInputFocus = () => {
+  const handleSearchInputFocus = useCallback(() => {
     if (searchQuery.trim().length > 0) {
       setShowSearchResults(true);
     }
-  };
+  }, [searchQuery]);
 
-  const handleSearchInputBlur = () => {
+  const handleSearchInputBlur = useCallback(() => {
     setTimeout(() => {
       setShowSearchResults(false);
     }, 200);
-  };
+  }, []);
 
+  // Click outside handler
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
@@ -80,17 +132,57 @@ const Header = () => {
         setShowSearchResults(false);
       }
     };
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
+
+    if (showSearchResults) {
+      document.addEventListener("click", handleClickOutside);
+      return () => {
+        document.removeEventListener("click", handleClickOutside);
+      };
+    }
   }, [showSearchResults]);
+
+  // Handle category selection
+  const handleCategoryClick = useCallback(
+    (cat: { name?: string; slug?: string }) => {
+      if (!cat?.name || !cat?.slug) {
+        console.error("Invalid category data:", cat);
+        return;
+      }
+
+      console.log("Header: Category clicked:", cat.name, "slug:", cat.slug);
+
+      // Update store state
+      setSelectedCategory(cat.name);
+
+      // Navigate to category page with proper URL
+      router.push(`/category?category=${cat.slug}`);
+    },
+    [setSelectedCategory, router]
+  );
+
+  // Show loading states if needed
+  if (categoriesLoading || productsLoading || siteInfoLoading) {
+    return (
+      <header className="header">
+        <div className="logo">
+          <img src="/icons/logo.png" alt="logo" />
+          <h5>{t("logo")}</h5>
+        </div>
+        <nav className="navbar">
+          <div>Loading...</div>
+        </nav>
+      </header>
+    );
+  }
 
   return (
     <header className="header">
       <Link href="/" className="logo">
-        <img src="/icons/logo.png" alt="logo" />
-        <h5>{t("logo")}</h5>
+        <img
+          src={favicon?.url ? getImageUrl(favicon.url) : "/icons/logo.png"}
+          alt={siteName || "logo"}
+        />
+        <h5>{siteName || t("logo")}</h5>
       </Link>
       <nav className="navbar">
         {!isHomePage ? (
@@ -111,24 +203,33 @@ const Header = () => {
               <div className="search-results">
                 {searchResults.map((product) => (
                   <div
-                    key={product.id}
+                    key={product?.id || Math.random()}
                     className="search-result-item"
-                    onClick={() => handleSearchResultClick(product.id)}
+                    onClick={() =>
+                      product?.documentId &&
+                      handleSearchResultClick(product.documentId)
+                    }
                   >
                     <img
-                      src={product.image}
-                      alt={product.name}
+                      src={
+                        product?.img?.url
+                          ? getImageUrl(product.img.url)
+                          : "/img/cardimg.png"
+                      }
+                      alt={product?.title || "Product"}
                       className="search-result-image"
                     />
                     <div className="search-result-content">
                       <div className="search-result-name">
-                        {t(product.name.toLowerCase().replace(/\s+/g, ""))}
+                        {product?.title || "Unknown Product"}
                       </div>
                       <div className="search-result-category">
-                        {t(product.category)}
+                        {product?.material || "No material"}
                       </div>
                       <div className="search-result-price">
-                        ${product.price.toLocaleString()}
+                        {product?.price
+                          ? formatPriceNumber(product.price)
+                          : "N/A"}
                       </div>
                     </div>
                   </div>
@@ -138,28 +239,27 @@ const Header = () => {
           </div>
         ) : (
           <ul className="menu-list">
-            {categories.map((cat) => (
-              <li key={cat.name}>
-                <button
-                  className={
-                    selectedCategory === cat.name ? "active-category" : ""
-                  }
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    color: "inherit",
-                    font: "inherit",
-                  }}
-                  onClick={() => {
-                    setSelectedCategory(cat.name);
-                    router.push("/category");
-                  }}
-                >
-                  {t(cat.name)}
-                </button>
-              </li>
-            ))}
+            {categories &&
+              Array.isArray(categories) &&
+              categories.map((cat) => (
+                <li key={cat?.id || Math.random()}>
+                  <button
+                    className={
+                      selectedCategory === cat?.name ? "active-category" : ""
+                    }
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "inherit",
+                      font: "inherit",
+                    }}
+                    onClick={() => cat && handleCategoryClick(cat)}
+                  >
+                    {cat?.name || "Unknown Category"}
+                  </button>
+                </li>
+              ))}
           </ul>
         )}
         <ul className="btn-group">

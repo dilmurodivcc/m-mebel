@@ -6,7 +6,10 @@ import ClientLayout from "../components/layout/ClientLayout";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { products } from "@/data/products";
+import { useGetProducts } from "@/hooks/getProducts";
+import { useGetCategories } from "@/hooks/getCategories";
+import { useGetSiteInfo } from "@/hooks/getGlobals";
+import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
 
 // Extend Window interface for setNavigationLoading
 declare global {
@@ -21,21 +24,44 @@ export default function Home() {
   const { t } = useTranslation();
   const router = useRouter();
 
-  // New arrivals products (last 3 products from the products array)
+  // API hooks
+  const {
+    data: productsData,
+    loading: productsLoading,
+    error: productsError,
+  } = useGetProducts();
+  const {
+    data: categoriesData,
+    loading: categoriesLoading,
+    error: categoriesError,
+  } = useGetCategories();
+  const {
+    heroImage,
+    loading: siteInfoLoading,
+    error: siteInfoError,
+  } = useGetSiteInfo();
+
+  // Get products from API
+  const products = productsData?.data || [];
+
+  // New arrivals products (last 3 products from the API)
   const newArrivalsProducts = products.slice(-3);
 
-  // Featured products (first 3 products from the products array)
+  // Featured products (first 3 products from the API)
   const featuredProducts = products.slice(0, 3);
+
+  // Get categories from API
+  const categories = categoriesData?.data || [];
 
   useEffect(() => {
     router.prefetch("/category");
     // Prefetch product pages for better performance
     newArrivalsProducts.forEach((product) => {
-      router.prefetch(`/product/${product.id}`);
+      router.prefetch(`/product/${product.documentId}`);
     });
     // Prefetch featured product pages
     featuredProducts.forEach((product) => {
-      router.prefetch(`/product/${product.id}`);
+      router.prefetch(`/product/${product.documentId}`);
     });
   }, [router, newArrivalsProducts, featuredProducts]);
 
@@ -52,23 +78,65 @@ export default function Home() {
     }, 0);
   };
 
-  const categories = [
-    { name: "sofas", image: "/img/cardimg.png" },
-    { name: "sectionals", image: "/img/cardimg.png" },
-    { name: "coffeeTables", image: "/img/cardimg.png" },
-    { name: "endTables", image: "/img/cardimg.png" },
-    { name: "tvStands", image: "/img/cardimg.png" },
-    { name: "armchairs", image: "/img/cardimg.png" },
-  ];
+  // Loading state
+  if (productsLoading || categoriesLoading || siteInfoLoading) {
+    return (
+      <ClientLayout showHeader={true} showFooter={true}>
+        <main className="home-page">
+          <div style={{ textAlign: "center", padding: "50px" }}>
+            <h2>Loading...</h2>
+          </div>
+        </main>
+      </ClientLayout>
+    );
+  }
+
+  // Error state
+  if (productsError || categoriesError || siteInfoError) {
+    return (
+      <ClientLayout showHeader={true} showFooter={true}>
+        <main className="home-page">
+          <div style={{ textAlign: "center", padding: "50px" }}>
+            <h2>Error loading data</h2>
+            {productsError && <p>Products error: {productsError}</p>}
+            {categoriesError && <p>Categories error: {categoriesError}</p>}
+            {siteInfoError && <p>Site info error: {siteInfoError}</p>}
+            <button onClick={() => window.location.reload()}>Retry</button>
+          </div>
+        </main>
+      </ClientLayout>
+    );
+  }
 
   return (
     <ClientLayout showHeader={true} showFooter={true}>
       <main className="home-page">
         <section className="hero-section">
-          <div className="hero-content">
-            <h1>{t("heroTitle")}</h1>
-            <p>{t("heroSubtitle")}</p>
-          </div>
+          {heroImage ? (
+            <>
+              <div className="hero-background">
+                <img
+                  src={getImageUrl(heroImage.url)}
+                  alt={heroImage.name || "Hero Image"}
+                  className="hero-image"
+                />
+                <div className="hero-overlay"></div>
+              </div>
+              <div className="hero-content">
+                <div className="container">
+                  <h1>{t("heroTitle")}</h1>
+                  <p>{t("heroSubtitle")}</p>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="hero-content fallback">
+              <div className="container">
+                <h1>{t("heroTitle")}</h1>
+                <p>{t("heroSubtitle")}</p>
+              </div>
+            </div>
+          )}
         </section>
 
         <section className="featured-collections">
@@ -78,21 +146,21 @@ export default function Home() {
               {featuredProducts.map((product) => (
                 <Link
                   key={product.id}
-                  href={`/product/${product.id}`}
+                  href={`/product/${product.documentId}`}
                   className="collection-card"
                   onClick={handleProductClick}
                   prefetch={true}
                 >
                   <div className="card-image">
                     <img
-                      src={product.image}
-                      alt={t(product.name.toLowerCase().replace(/\s+/g, ""))}
+                      src={getImageUrl(product.img?.url)}
+                      alt={product.title}
                     />
                   </div>
                   <div className="card-content">
-                    <h3>{t(product.name.toLowerCase().replace(/\s+/g, ""))}</h3>
+                    <h3>{product.title}</h3>
                     <p className="product-price">
-                      ${product.price.toLocaleString()}
+                      {formatPriceNumber(product.price)}
                     </p>
                   </div>
                 </Link>
@@ -105,12 +173,19 @@ export default function Home() {
           <div className="container">
             <h2>{t("shopByCategory")}</h2>
             <div className="category-grid">
-              {categories.map((category, index) => (
-                <Link href={`/category`} key={index} className="category-card">
+              {categories.map((category) => (
+                <Link
+                  href={`/category?category=${category.slug}`}
+                  key={category.id}
+                  className="category-card"
+                >
                   <div className="category-image">
-                    <img src={category.image} alt={t(category.name)} />
+                    <img
+                      src={getImageUrl(category.image?.url)}
+                      alt={category.name}
+                    />
                   </div>
-                  <h3>{t(category.name)}</h3>
+                  <h3>{category.name}</h3>
                 </Link>
               ))}
             </div>
@@ -124,21 +199,21 @@ export default function Home() {
               {newArrivalsProducts.map((product) => (
                 <Link
                   key={product.id}
-                  href={`/product/${product.id}`}
+                  href={`/product/${product.documentId}`}
                   className="collection-card"
                   onClick={handleProductClick}
                   prefetch={true}
                 >
                   <div className="card-image">
                     <img
-                      src={product.image}
-                      alt={t(product.name.toLowerCase().replace(/\s+/g, ""))}
+                      src={getImageUrl(product.img?.url)}
+                      alt={product.title}
                     />
                   </div>
                   <div className="card-content">
-                    <h3>{t(product.name.toLowerCase().replace(/\s+/g, ""))}</h3>
+                    <h3>{product.title}</h3>
                     <p className="product-price">
-                      ${product.price.toLocaleString()}
+                      {formatPriceNumber(product.price)}
                     </p>
                   </div>
                 </Link>

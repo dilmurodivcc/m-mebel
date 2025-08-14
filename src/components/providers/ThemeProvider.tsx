@@ -22,9 +22,7 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
     }
   }, [theme, mounted]);
 
-  if (!mounted) {
-    return null;
-  }
-
+  // Return children even when not mounted to prevent React errors
+  // The theme will be applied once mounted
   return <>{children}</>;
 }

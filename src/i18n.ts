@@ -24,7 +24,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: "en",
+    fallbackLng: "ru",
     debug: false,
     interpolation: {
       escapeValue: false,
@@ -38,7 +38,7 @@ i18n
       useSuspense: false,
     },
     load: 'languageOnly',
-    preload: ['en', 'uz', 'ru'],
+    preload: ['ru', 'uz', 'en'],
   });
 
 export default i18n; 
