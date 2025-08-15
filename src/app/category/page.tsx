@@ -31,7 +31,6 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 
 const PRODUCTS_PER_PAGE_GRID = 18;
-const PRODUCTS_PER_PAGE_LIST = 10;
 
 const sortOptions = [
   { value: "asc", label: "priceLowToHigh" },
@@ -208,45 +207,16 @@ const Category = () => {
   const productsByCategory = productsByCategoryData?.data || [];
   const allProducts = allProductsData?.data || [];
 
-  // Debug logging
-  console.log("=== CATEGORY PAGE DEBUG ===");
-  console.log("Category slug from URL:", categorySlug);
-  console.log("Categories from API:", categories);
-  console.log("Products by category:", productsByCategory?.length || 0);
-  console.log(
-    "Products by multiple categories:",
-    productsByMultipleCategoriesData?.data?.length || 0
-  );
-  console.log("All products count:", allProducts.length);
-  console.log("Selected categories:", selectedCategories);
-  console.log("Selected category IDs:", selectedCategoryIds);
-  console.log("Selected category from store:", selectedCategory);
-  console.log(
-    "API Base URL from environment:",
-    process.env.NEXT_PUBLIC_API_URL
-  );
-
   // Sync URL params with store state
   useEffect(() => {
-    console.log("=== URL SYNC EFFECT ===");
-    console.log("Category slug:", categorySlug);
-    console.log(
-      "Available categories:",
-      categories.map((c) => ({ name: c.name, slug: c.slug }))
-    );
-
     if (categorySlug) {
       const category = categories.find((cat) => cat.slug === categorySlug);
       if (category) {
-        console.log("Found category from slug:", category.name);
         setSelectedCategory(category.name);
         setSelectedCategories([category.name]);
-      } else {
-        console.log("Category not found for slug:", categorySlug);
       }
     } else {
       // Clear category selection when no slug in URL
-      console.log("No category slug, clearing selection");
       setSelectedCategory("");
       setSelectedCategories([]);
     }
@@ -272,20 +242,10 @@ const Category = () => {
 
   // Determine which products to use based on category selection
   const products = useMemo(() => {
-    console.log("=== PRODUCT FILTERING ===");
-    console.log("Category slug:", categorySlug);
-    console.log("Category products count:", productsByCategory.length);
-    console.log("Selected categories:", selectedCategories);
-    console.log("Selected category IDs:", selectedCategoryIds);
-
     // If we have multiple selected categories, use API data
     if (selectedCategories.length > 1) {
       const multipleCategoriesProducts =
         productsByMultipleCategoriesData?.data || [];
-      console.log(
-        "Using API products from multiple categories:",
-        multipleCategoriesProducts.length
-      );
       return multipleCategoriesProducts;
     }
 
@@ -295,29 +255,19 @@ const Category = () => {
       productsByCategory.length > 0 &&
       selectedCategories.length === 1
     ) {
-      console.log(
-        "Using category-specific products:",
-        productsByCategory.length
-      );
       return productsByCategory;
     }
 
     // If we have selected categories but no category slug (fallback filtering)
     if (selectedCategories.length === 1) {
-      console.log("Filtering by single selected category:", selectedCategories);
       const filtered = allProducts.filter((product: ProductForCard) => {
         const materialMatch = product.material === selectedCategories[0];
-        console.log(
-          `Product ${product.title}: material=${product.material}, looking for=${selectedCategories[0]}, matches=${materialMatch}`
-        );
         return materialMatch;
       });
-      console.log("Using filtered products:", filtered.length);
       return filtered;
     }
 
     // Show all products if no category is selected
-    console.log("Using all products:", allProducts.length);
     return allProducts;
   }, [
     categorySlug,
@@ -328,15 +278,12 @@ const Category = () => {
     allProducts,
   ]);
 
-  // Memoized category options
   const categoryOptions = useMemo(
     () => categories.map((cat) => cat.name),
     [categories]
   );
 
-  // Memoized filtered and sorted products
   const { totalPages, paginatedProducts } = useMemo(() => {
-    // Since products are now pre-filtered by API, we only need to apply price filtering
     const filtered = products.filter((product: ProductForCard) => {
       const min = priceRange.min ? parseInt(priceRange.min) : 0;
       const max = priceRange.max ? parseInt(priceRange.max) : Infinity;
@@ -344,24 +291,15 @@ const Category = () => {
       return priceMatch;
     });
 
-    // Sort products
     const sorted = [...filtered].sort((a, b) =>
       sortOrder === "asc" ? a.price - b.price : b.price - a.price
     );
 
-    // Pagination
     const total = Math.ceil(sorted.length / PRODUCTS_PER_PAGE_GRID);
     const paginated = sorted.slice(
       (currentPage - 1) * PRODUCTS_PER_PAGE_GRID,
       currentPage * PRODUCTS_PER_PAGE_GRID
     );
-
-    console.log("Final products:", {
-      filtered: filtered.length,
-      sorted: sorted.length,
-      paginated: paginated.length,
-      totalPages: total,
-    });
 
     return {
       totalPages: total,
@@ -371,15 +309,11 @@ const Category = () => {
 
   const handleCategoryClick = useCallback(
     (cat: string) => {
-      console.log("Category clicked:", cat);
-
       if (cat === t("allCategories")) {
-        console.log("All categories clicked, clearing selection");
         setSelectedCategories([]);
         setSelectedCategory("");
         router.push("/category");
       } else if (selectedCategories.includes(cat)) {
-        console.log("Removing category:", cat);
         const newCategories = selectedCategories.filter((c) => c !== cat);
         setSelectedCategories(newCategories);
 
@@ -391,7 +325,6 @@ const Category = () => {
           setSelectedCategory(newCategories.join(", "));
         }
       } else {
-        console.log("Adding category:", cat);
         const newCategories = [
           ...selectedCategories.filter((c) => c !== t("allCategories")),
           cat,
@@ -427,7 +360,7 @@ const Category = () => {
   // Optimized remove category handler
   const handleRemoveCategory = useCallback(
     (cat: string) => {
-      console.log("Removing category:", cat);
+
       const newCategories = selectedCategories.filter((c) => c !== cat);
       setSelectedCategories(newCategories);
 

@@ -10,7 +10,6 @@ const LanguageSwitcher = () => {
     try {
       await i18n.changeLanguage(lng);
     } catch (err) {
-      console.error("changeLanguage error:", err);
     }
   };
   return (

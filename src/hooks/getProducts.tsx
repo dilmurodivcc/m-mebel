@@ -141,7 +141,6 @@ export const useGetProducts = () => {
 
         setLoading(true);
         setError(null);
-        console.log("Fetching products...");
         const response = await fetchWithCache(
           "products?populate=img",
           () =>
@@ -153,13 +152,11 @@ export const useGetProducts = () => {
 
         if (!isMounted) return;
 
-        console.log("Products response:", response.data);
         setData(response.data);
         setLastFetch(now);
       } catch (error: unknown) {
         if (!isMounted) return;
 
-        console.warn("Error fetching products:", error);
         const maybe = error as {
           message?: string;
           response?: { data?: { message?: string } };
@@ -203,7 +200,6 @@ export const useGetProduct = (documentId: string) => {
       try {
         setLoading(true);
         setError(null);
-        console.log("Fetching product:", documentId);
         const response = await fetchWithCache(
           `product:${documentId}`,
           () =>
@@ -212,10 +208,8 @@ export const useGetProduct = (documentId: string) => {
             }).then((r) => r),
           5 * 60 * 1000
         );
-        console.log("Product response:", response.data);
         setData(response.data);
       } catch (error: unknown) {
-        console.warn("Error fetching product:", error);
         const maybe = error as {
           message?: string;
           response?: { data?: { message?: string } };
@@ -387,14 +381,11 @@ export const useGetProductsByCategoryIds = (categoryIds: number[]) => {
         setLoading(true);
         setError(null);
 
-        // Build URL with multiple category IDs using $in operator with array format
         const categoryFilters = categoryIds
           .map((id, index) => `filters[category][id][$in][${index}]=${id}`)
           .join("&");
         const url = `/api/products?${categoryFilters}&populate=img`;
 
-        console.log("Fetching products by category IDs:", categoryIds);
-        console.log("URL:", url);
 
         const response = await fetchWithCache(
           `products-by-category-ids:${categoryIds.join(",")}`,

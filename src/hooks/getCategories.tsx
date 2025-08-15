@@ -115,7 +115,6 @@ export const useGetCategories = () => {
 
         setLoading(true);
         setError(null);
-        console.log("Fetching categories...");
         const response = await fetchWithCache(
           "categories?populate=image",
           () =>
@@ -127,13 +126,11 @@ export const useGetCategories = () => {
 
         if (!isMounted) return;
 
-        console.log("Categories response:", response.data);
         setData(response.data);
         setLastFetch(now);
       } catch (error: unknown) {
         if (!isMounted) return;
 
-        console.warn("Error fetching categories:", error);
         const maybe = error as {
           message?: string;
           response?: { data?: { message?: string } };
@@ -317,13 +314,7 @@ export const useGetCategoryWithProducts = (slug: string) => {
 
         setLoading(true);
         setError(null);
-        console.log("Fetching category with products:", slug);
         const url = `/api/categories?filters[slug][$eq]=${slug}&populate=products`;
-        console.log("API URL:", url);
-        console.log(
-          "Full API call will be made to:",
-          API.defaults.baseURL + url
-        );
         const response = await fetchWithCache(
           `category-with-products:${slug}`,
           () => API.get(url, { signal: controller.signal }).then((r) => r),
@@ -332,17 +323,11 @@ export const useGetCategoryWithProducts = (slug: string) => {
 
         if (!isMounted) return;
 
-        console.log("Category with products response:", response.data);
-        console.log(
-          "Category products count:",
-          response.data?.data?.[0]?.products?.length || 0
-        );
         setData(response.data);
         setLastFetch(now);
       } catch (error: unknown) {
         if (!isMounted) return;
 
-        console.warn("Error fetching category with products:", error);
         const maybe = error as {
           message?: string;
           response?: { data?: { message?: string } };

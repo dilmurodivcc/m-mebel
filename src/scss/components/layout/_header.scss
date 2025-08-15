@@ -37,13 +37,27 @@
     font-family: var(--font-secondary);
     font-size: 1.5rem;
     color: var(--text-tertiary);
+    min-width: 200px; // Prevent layout shift
+    text-decoration: none; // Remove link underline
+
     img {
       margin-bottom: -10px;
       height: 80px;
       margin-left: -20px;
+      width: 120px; // Fixed width to prevent layout shift
+      object-fit: contain;
+      transition: opacity 0.3s ease;
     }
+
     h5 {
       margin-left: -30px;
+      white-space: nowrap; // Prevent text wrapping
+      transition: opacity 0.3s ease;
+    }
+
+    &:hover {
+      text-decoration: none;
+      color: var(--text-tertiary);
     }
   }
   .btn-group {

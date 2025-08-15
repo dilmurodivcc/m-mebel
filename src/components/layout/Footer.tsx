@@ -99,12 +99,7 @@ const Footer = () => {
               <Link
                 href={`/category?category=${cat.slug}`}
                 onClick={() => {
-                  console.log(
-                    "Footer: Category clicked:",
-                    cat.name,
-                    "slug:",
-                    cat.slug
-                  );
+          
                   setSelectedCategory(cat.name);
                 }}
               >

@@ -46,10 +46,10 @@ export default function Home() {
   const products = productsData?.data || [];
 
   // New arrivals products (last 3 products from the API)
-  const newArrivalsProducts = products.slice(-3);
+  const newArrivalsProducts = products.slice(-4);
 
   // Featured products (first 3 products from the API)
-  const featuredProducts = products.slice(0, 3);
+  const featuredProducts = products.slice(0, 4);
 
   // Get categories from API
   const categories = categoriesData?.data || [];
@@ -73,9 +73,7 @@ export default function Home() {
         if (typeof window !== "undefined" && window.setNavigationLoading) {
           window.setNavigationLoading(true);
         }
-      } catch {
-        console.log("Navigation loading not available");
-      }
+      } catch {}
     }, 0);
   };
 
@@ -97,9 +95,7 @@ export default function Home() {
             <div className="container">
               <h2>{t("featuredCollections")}</h2>
               <div className="collections-grid">
-                <div className="skeleton-grid">
-                  <SkeletonGrid count={3} type="collection" />
-                </div>
+                <SkeletonGrid count={4} type="collection" />
               </div>
             </div>
           </section>
@@ -108,9 +104,7 @@ export default function Home() {
             <div className="container">
               <h2>{t("shopByCategory")}</h2>
               <div className="category-grid">
-                <div className="skeleton-grid">
-                  <SkeletonGrid count={6} type="category" />
-                </div>
+                <SkeletonGrid count={6} type="category" />
               </div>
             </div>
           </section>
@@ -119,9 +113,7 @@ export default function Home() {
             <div className="container">
               <h2>{t("newArrivals")}</h2>
               <div className="collections-grid">
-                <div className="skeleton-grid">
-                  <SkeletonGrid count={3} type="collection" />
-                </div>
+                <SkeletonGrid count={4} type="collection" />
               </div>
             </div>
           </section>
@@ -183,9 +175,7 @@ export default function Home() {
             <h2>{t("featuredCollections")}</h2>
             <div className="collections-grid">
               {productsLoading ? (
-                <div className="skeleton-grid">
-                  <SkeletonGrid count={3} type="collection" />
-                </div>
+                <SkeletonGrid count={3} type="collection" />
               ) : (
                 featuredProducts.map((product) => (
                   <Link
@@ -219,9 +209,7 @@ export default function Home() {
             <h2>{t("shopByCategory")}</h2>
             <div className="category-grid">
               {categoriesLoading ? (
-                <div className="skeleton-grid">
-                  <SkeletonGrid count={6} type="category" />
-                </div>
+                <SkeletonGrid count={6} type="category" />
               ) : (
                 categories.map((category) => (
                   <Link
@@ -248,9 +236,7 @@ export default function Home() {
             <h2>{t("newArrivals")}</h2>
             <div className="collections-grid">
               {productsLoading ? (
-                <div className="skeleton-grid">
-                  <SkeletonGrid count={3} type="collection" />
-                </div>
+                <SkeletonGrid count={3} type="collection" />
               ) : (
                 newArrivalsProducts.map((product) => (
                   <Link

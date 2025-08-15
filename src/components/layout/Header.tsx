@@ -40,19 +40,10 @@ const Header = () => {
   const isHomePage = pathname === "/";
 
   // API hooks
-  const {
-    data: categoriesData,
-    loading: categoriesLoading,
-  } = useGetCategories();
-  const {
-    data: productsData,
-    loading: productsLoading,
-  } = useGetProducts();
-  const {
-    siteName,
-    favicon,
-    loading: siteInfoLoading,
-  } = useGetSiteInfo();
+  const { data: categoriesData, loading: categoriesLoading } =
+    useGetCategories();
+  const { data: productsData, loading: productsLoading } = useGetProducts();
+  const { siteName, favicon, loading: siteInfoLoading } = useGetSiteInfo();
 
   // Get data from API with safe fallbacks
   const categories = useMemo(
@@ -102,7 +93,6 @@ const Header = () => {
   const handleSearchResultClick = useCallback(
     (documentId: string) => {
       if (!documentId) {
-        console.error("Invalid documentId:", documentId);
         return;
       }
       setSearchQuery("");
@@ -145,11 +135,9 @@ const Header = () => {
   const handleCategoryClick = useCallback(
     (cat: { name?: string; slug?: string }) => {
       if (!cat?.name || !cat?.slug) {
-        console.error("Invalid category data:", cat);
         return;
       }
 
-      console.log("Header: Category clicked:", cat.name, "slug:", cat.slug);
 
       // Update store state
       setSelectedCategory(cat.name);
@@ -164,12 +152,29 @@ const Header = () => {
   if (categoriesLoading || productsLoading || siteInfoLoading) {
     return (
       <header className="header">
-        <div className="logo">
-          <img src="/icons/logo.png" alt="logo" />
-          <h5>{t("logo")}</h5>
-        </div>
+        <Link href="/" className="logo">
+          <img
+            src={favicon?.url ? getImageUrl(favicon.url) : "/icons/logo.png"}
+            alt={siteName || "logo"}
+            width={120}
+            style={{
+              opacity: siteInfoLoading ? 0.7 : 1,
+              transition: "opacity 0.3s ease",
+            }}
+          />
+          <h5
+            style={{
+              opacity: siteInfoLoading ? 0.7 : 1,
+              transition: "opacity 0.3s ease",
+            }}
+          >
+            {siteName || t("logo")}
+          </h5>
+        </Link>
         <nav className="navbar">
-          <div>Loading...</div>
+          <div style={{ color: "var(--text-tertiary)", fontSize: "14px" }}>
+            Loading...
+          </div>
         </nav>
       </header>
     );
@@ -181,6 +186,7 @@ const Header = () => {
         <img
           src={favicon?.url ? getImageUrl(favicon.url) : "/icons/logo.png"}
           alt={siteName || "logo"}
+          width={120}
         />
         <h5>{siteName || t("logo")}</h5>
       </Link>

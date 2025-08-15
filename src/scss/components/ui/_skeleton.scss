@@ -32,6 +32,7 @@
   animation: skeleton-shimmer 1.5s infinite;
   border-radius: 4px;
   display: block;
+  min-height: 1px;
 }
 
 // Product card skeleton
@@ -120,10 +121,12 @@
 // Collection card skeleton (for home page)
 .collection-card-skeleton {
   background: var(--card-bg);
-  border-radius: 12px;
+  border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease;
+  max-width: 350px;
+  cursor: pointer;
 
   .skeleton-image {
     width: 100%;
@@ -139,17 +142,17 @@
   }
 
   .skeleton-content {
-    padding: 20px;
+    padding: 18px 0;
 
     .skeleton-title {
-      height: 24px;
-      width: 85%;
-      margin-bottom: 16px;
+      height: 18px;
+      width: 80%;
+      margin-bottom: 12px;
     }
 
     .skeleton-price {
-      height: 20px;
-      width: 65%;
+      height: 16px;
+      width: 60%;
     }
   }
 }
@@ -157,15 +160,19 @@
 // Category card skeleton
 .category-card-skeleton {
   background: var(--card-bg);
-  border-radius: 12px;
+  border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease;
   text-align: center;
+  max-width: 350px;
+  cursor: pointer;
 
   .skeleton-image {
     width: 100%;
-    height: 180px;
+    height: 250px;
+    border-radius: 10px;
+    margin-bottom: 15px;
     background: linear-gradient(
       90deg,
       var(--skeleton-bg) 25%,
@@ -179,7 +186,8 @@
   .skeleton-title {
     height: 20px;
     width: 70%;
-    margin: 16px auto;
+    margin: 0 auto;
+    text-align: start;
   }
 }
 
@@ -290,6 +298,7 @@
 .skeleton-grid {
   display: grid;
   gap: 24px;
+  width: 100%;
 
   &.grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -308,22 +317,26 @@
 
 // Match existing grid layouts
 .collections-grid .skeleton-grid {
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 30px;
 
   @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: 1fr;
     gap: 20px;
   }
 }
 
 .category-grid .skeleton-grid {
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
 
   @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
   }
 }
 

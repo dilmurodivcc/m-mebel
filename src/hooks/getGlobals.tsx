@@ -109,11 +109,10 @@ export const useGetGlobals = () => {
 
         setLoading(true);
         setError(null);
-        console.log("Fetching globals...");
         const response = await fetchWithCache(
-          "globals?populate=*",
+          "globals?populate=favicon",
           () =>
-            API.get("/api/global?populate=*", {
+            API.get("/api/global?populate=favicon", {
               signal: controller.signal,
             }).then((r) => r),
           5 * 60 * 1000
@@ -121,12 +120,10 @@ export const useGetGlobals = () => {
 
         if (!isMounted) return;
 
-        console.log("Globals response:", response.data);
         setData(response.data);
       } catch (error: unknown) {
         if (!isMounted) return;
 
-        console.warn("Error fetching globals:", error);
         const maybe = error as {
           message?: string;
           response?: { data?: { message?: string } };
