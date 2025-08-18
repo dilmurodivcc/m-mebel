@@ -7,6 +7,8 @@ interface ThemeState {
   theme: 'light' | 'dark';
   setTheme: (theme: 'light' | 'dark') => void;
   toggleTheme: () => void;
+  language: 'uz' | 'ru';
+  setLanguage: (language: 'uz' | 'ru') => void;
 }
 
 export type { ThemeState };
@@ -22,6 +24,10 @@ export const useThemeStore = create<ThemeState>()(
         const currentTheme = get().theme;
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
         get().setTheme(newTheme);
+      },
+      language: 'ru',
+      setLanguage: (language) => {
+        set({ language });
       },
     }),
     {

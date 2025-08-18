@@ -19,6 +19,7 @@ const Header = () => {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useThemeStore();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isClient, setIsClient] = useState(false);
   type SearchProduct = {
     id: number;
     documentId?: string;
@@ -27,6 +28,7 @@ const Header = () => {
     price?: number;
     img?: { url?: string };
   };
+  const maxCategoryLength = 4;
   const [searchResults, setSearchResults] = useState<SearchProduct[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const selectedCategory = useCategoryStore(
@@ -39,20 +41,21 @@ const Header = () => {
   const pathname = usePathname();
   const isHomePage = pathname === "/";
 
-  // API hooks
   const { data: categoriesData, loading: categoriesLoading } =
     useGetCategories();
   const { data: productsData, loading: productsLoading } = useGetProducts();
   const { siteName, favicon, loading: siteInfoLoading } = useGetSiteInfo();
 
-  // Get data from API with safe fallbacks
   const categories = useMemo(
     () => categoriesData?.data || [],
     [categoriesData]
   );
   const products = useMemo(() => productsData?.data || [], [productsData]);
 
-  // Memoized search results to prevent unnecessary recalculations
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const filteredSearchResults = useMemo(() => {
     if (
       !searchQuery.trim() ||
@@ -138,7 +141,6 @@ const Header = () => {
         return;
       }
 
-
       // Update store state
       setSelectedCategory(cat.name);
 
@@ -155,20 +157,22 @@ const Header = () => {
         <Link href="/" className="logo">
           <img
             src={favicon?.url ? getImageUrl(favicon.url) : "/icons/logo.png"}
-            alt={siteName || "logo"}
+            alt="logo"
             width={120}
             style={{
               opacity: siteInfoLoading ? 0.7 : 1,
               transition: "opacity 0.3s ease",
             }}
+            suppressHydrationWarning
           />
           <h5
             style={{
               opacity: siteInfoLoading ? 0.7 : 1,
               transition: "opacity 0.3s ease",
             }}
+            suppressHydrationWarning
           >
-            {siteName || t("logo")}
+            Loading...
           </h5>
         </Link>
         <nav className="navbar">
@@ -185,10 +189,13 @@ const Header = () => {
       <Link href="/" className="logo">
         <img
           src={favicon?.url ? getImageUrl(favicon.url) : "/icons/logo.png"}
-          alt={siteName || "logo"}
+          alt={isClient ? siteName || "logo" : "logo"}
           width={120}
+          suppressHydrationWarning
         />
-        <h5>{siteName || t("logo")}</h5>
+        <h5 suppressHydrationWarning>
+          {isClient ? siteName || t("logo") : "Loading..."}
+        </h5>
       </Link>
       <nav className="navbar">
         {!isHomePage ? (
@@ -245,27 +252,25 @@ const Header = () => {
           </div>
         ) : (
           <ul className="menu-list">
-            {categories &&
-              Array.isArray(categories) &&
-              categories.map((cat) => (
-                <li key={cat?.id || Math.random()}>
-                  <button
-                    className={
-                      selectedCategory === cat?.name ? "active-category" : ""
-                    }
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      color: "inherit",
-                      font: "inherit",
-                    }}
-                    onClick={() => cat && handleCategoryClick(cat)}
-                  >
-                    {cat?.name || "Unknown Category"}
-                  </button>
-                </li>
-              ))}
+            {categories.slice(0, maxCategoryLength).map((cat) => (
+              <li key={cat?.id || Math.random()}>
+                <button
+                  className={
+                    selectedCategory === cat?.name ? "active-category" : ""
+                  }
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "inherit",
+                    font: "inherit",
+                  }}
+                  onClick={() => cat && handleCategoryClick(cat)}
+                >
+                  {cat?.name || "Unknown Category"}
+                </button>
+              </li>
+            ))}
           </ul>
         )}
         <ul className="btn-group">

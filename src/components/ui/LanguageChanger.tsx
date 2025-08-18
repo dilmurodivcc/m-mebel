@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { GrLanguage } from "react-icons/gr";
 import { useTranslation } from "react-i18next";
+import { useThemeStore } from "../../app/theme/store";
 
 const languages = [
   {
@@ -15,19 +16,21 @@ const languages = [
     code: "ru",
     icon: "/icons/ru.png",
   },
-  {
-    name: "English",
-    code: "en",
-    icon: "/icons/en.jpg",
-  },
 ];
 
-
-
-const LanguageChanger = ({
-  className = "",
-}) => {
+/**
+ * LanguageChanger component that handles language switching.
+ * When a language is selected:
+ * 1. Updates i18n language for UI translations
+ * 2. Updates the language store for persistence
+ * 3. Reloads the page to ensure API requests use the new locale
+ *
+ * The API interceptor will automatically add locale=uz or locale=ru
+ * to all subsequent API requests based on the selected language.
+ */
+const LanguageChanger = ({ className = "" }) => {
   const { i18n } = useTranslation();
+  const { language, setLanguage } = useThemeStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
@@ -48,8 +51,19 @@ const LanguageChanger = ({
   }, [isDropdownOpen]);
 
   const handleLanguageChange = (languageCode: string) => {
+    // Update i18n language
     i18n.changeLanguage(languageCode);
+
+    // Update store language
+    setLanguage(languageCode as "uz" | "ru");
+
+    // Close dropdown
     setIsDropdownOpen(false);
+
+    // Reload page to update API locale parameter
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
   };
 
   const handleLanguageButtonClick = () => {
@@ -77,13 +91,12 @@ const LanguageChanger = ({
               >
                 <img
                   width={18}
-                  height={18} 
+                  height={18}
                   style={{ borderRadius: "50%" }}
                   src={language.icon}
                   alt={language.name}
                 />
                 {language.name}
-          
               </li>
             ))}
           </ul>
@@ -93,4 +106,4 @@ const LanguageChanger = ({
   );
 };
 
-export default LanguageChanger; 
+export default LanguageChanger;

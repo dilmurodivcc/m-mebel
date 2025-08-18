@@ -2,6 +2,7 @@
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import ThemeProvider from "../providers/ThemeProvider";
+import SEOProvider from "../providers/SEOProvider";
 
 export default function ClientLayout({
   children,
@@ -15,10 +16,12 @@ export default function ClientLayout({
   const isNeedSpace = showHeader;
   return (
     <ThemeProvider>
-      {isNeedSpace && <div className="space" style={{ height: "100px" }}></div>}
-      {showHeader && <Header />}
-      {children}
-      {showFooter && <Footer />}
+      <SEOProvider>
+        {isNeedSpace && <div className="space" style={{ height: "100px" }}></div>}
+        {showHeader && <Header />}
+        {children}
+        {showFooter && <Footer />}
+      </SEOProvider>
     </ThemeProvider>
   );
 }

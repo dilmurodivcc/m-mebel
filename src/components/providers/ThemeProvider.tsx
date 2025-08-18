@@ -13,12 +13,13 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
 
   useEffect(() => {
     setMounted(true);
+    // Set initial theme immediately
+    document.documentElement.setAttribute("data-theme", theme);
   }, []);
 
   useEffect(() => {
     if (mounted) {
-      document.documentElement.classList.remove("light", "dark");
-      document.documentElement.classList.add(theme);
+      document.documentElement.setAttribute("data-theme", theme);
     }
   }, [theme, mounted]);
 

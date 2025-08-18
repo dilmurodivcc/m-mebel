@@ -48,3 +48,69 @@ export const formatPriceShort = (price: number): string => {
     return price + " sum";
   }
 };
+
+// Utility function to get current locale for API requests
+export const getCurrentLocale = (): string => {
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem('theme-storage');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        return parsed.state?.language || 'ru';
+      } catch {
+        return 'ru';
+      }
+    }
+  }
+  return 'ru';
+};
+
+// Helper function to add locale to API params
+export const addLocaleToParams = (params: Record<string, any> = {}): Record<string, any> => {
+  return {
+    ...params,
+    locale: getCurrentLocale(),
+  };
+};
+
+/**
+ * Builds proper Strapi populate parameters for multiple fields
+ * @param fields - Array of field names to populate
+ * @returns Object with proper populate parameters
+ */
+export const buildPopulateParams = (fields: string[]): Record<string, any> => {
+  const populateParams: Record<string, any> = {};
+  
+  fields.forEach((field, index) => {
+    populateParams[`populate[${index}]`] = field;
+  });
+  
+  return populateParams;
+};
+
+/**
+ * Builds a query string with proper Strapi populate parameters
+ * @param fields - Array of field names to populate
+ * @param additionalParams - Additional query parameters
+ * @returns Query string
+ */
+export const buildStrapiQuery = (
+  fields: string[] = [], 
+  additionalParams: Record<string, any> = {}
+): string => {
+  const params = new URLSearchParams();
+  
+  // Add populate parameters
+  fields.forEach((field, index) => {
+    params.append(`populate[${index}]`, field);
+  });
+  
+  // Add additional parameters
+  Object.entries(additionalParams).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      params.append(key, String(value));
+    }
+  });
+  
+  return params.toString();
+};

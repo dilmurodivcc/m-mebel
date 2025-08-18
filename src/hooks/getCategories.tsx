@@ -116,9 +116,9 @@ export const useGetCategories = () => {
         setLoading(true);
         setError(null);
         const response = await fetchWithCache(
-          "categories?populate=image",
+          "categories?populate[0]=image",
           () =>
-            API.get("/api/categories?populate=image", {
+            API.get("/api/categories?populate[0]=image", {
               signal: controller.signal,
             }).then((r) => r),
           5 * 60 * 1000
@@ -175,7 +175,7 @@ export const useGetCategory = (documentId: string) => {
         setLoading(true);
         setError(null);
         const response = await API.get(
-          `/api/categories/${documentId}?populate=image`,
+          `/api/categories/${documentId}?populate[0]=image`,
           { signal: controller.signal }
         );
         setData(response.data);
@@ -216,7 +216,7 @@ export const useGetCategoriesWithPagination = (
         setLoading(true);
         setError(null);
         const response = await API.get(
-          `/api/categories?populate=image&pagination[page]=${page}&pagination[pageSize]=${pageSize}`,
+          `/api/categories?populate[0]=image&pagination[page]=${page}&pagination[pageSize]=${pageSize}`,
           { signal: controller.signal }
         );
         setData(response.data);
@@ -260,7 +260,7 @@ export const useGetCategoryBySlug = (slug: string) => {
         setLoading(true);
         setError(null);
         const response = await API.get(
-          `/api/categories?populate=image&filters[slug][$eq]=${slug}`,
+          `/api/categories?populate[0]=image&filters[slug][$eq]=${slug}`,
           { signal: controller.signal }
         );
         setData(response.data);
@@ -314,7 +314,7 @@ export const useGetCategoryWithProducts = (slug: string) => {
 
         setLoading(true);
         setError(null);
-        const url = `/api/categories?filters[slug][$eq]=${slug}&populate=products`;
+        const url = `/api/categories?filters[slug][$eq]=${slug}&populate[0]=products`;
         const response = await fetchWithCache(
           `category-with-products:${slug}`,
           () => API.get(url, { signal: controller.signal }).then((r) => r),

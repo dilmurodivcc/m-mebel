@@ -97,6 +97,7 @@ export interface Product {
   publishedAt: string;
   material: string;
   img?: ProductImage;
+  detail_img?: ProductImage[];
   SizesOfProduct?: ProductSize;
 }
 
@@ -142,9 +143,9 @@ export const useGetProducts = () => {
         setLoading(true);
         setError(null);
         const response = await fetchWithCache(
-          "products?populate=img",
+          "products?populate[0]=img&populate[1]=detail_img",
           () =>
-            API.get("/api/products?populate=img", {
+            API.get("/api/products?populate[0]=img&populate[1]=detail_img", {
               signal: controller.signal,
             }).then((r) => r),
           5 * 60 * 1000
@@ -203,9 +204,12 @@ export const useGetProduct = (documentId: string) => {
         const response = await fetchWithCache(
           `product:${documentId}`,
           () =>
-            API.get(`/api/products/${documentId}?populate=*`, {
-              signal: controller.signal,
-            }).then((r) => r),
+            API.get(
+              `/api/products/${documentId}?populate[0]=img&populate[1]=detail_img&populate[2]=SizesOfProduct&populate[3]=category`,
+              {
+                signal: controller.signal,
+              }
+            ).then((r) => r),
           5 * 60 * 1000
         );
         setData(response.data);
@@ -245,7 +249,7 @@ export const useGetProductsWithPagination = (
         setLoading(true);
         setError(null);
         const response = await API.get(
-          `/api/products?populate=img&pagination[page]=${page}&pagination[pageSize]=${pageSize}`
+          `/api/products?populate[0]=img&populate[1]=detail_img&pagination[page]=${page}&pagination[pageSize]=${pageSize}`
         );
         setData(response.data);
       } catch (error: unknown) {
@@ -290,7 +294,7 @@ export const useGetProductsByMaterial = (material: string) => {
           `products-by-material:${material}`,
           () =>
             API.get(
-              `/api/products?populate=img&filters[material][$eq]=${material}`,
+              `/api/products?populate[0]=img&populate[1]=detail_img&filters[material][$eq]=${material}`,
               { signal: controller.signal }
             ).then((r) => r),
           5 * 60 * 1000
@@ -334,7 +338,7 @@ export const useGetProductsByCategorySlug = (categorySlug: string) => {
       try {
         setLoading(true);
         setError(null);
-        const url = `/api/products?filters[category][slug][$eq]=${categorySlug}&populate=img`;
+        const url = `/api/products?filters[category][slug][$eq]=${categorySlug}&populate[0]=img&populate[1]=detail_img`;
         const response = await fetchWithCache(
           `products-by-category:${categorySlug}`,
           () => API.get(url, { signal: controller.signal }).then((r) => r),
@@ -384,8 +388,7 @@ export const useGetProductsByCategoryIds = (categoryIds: number[]) => {
         const categoryFilters = categoryIds
           .map((id, index) => `filters[category][id][$in][${index}]=${id}`)
           .join("&");
-        const url = `/api/products?${categoryFilters}&populate=img`;
-
+        const url = `/api/products?${categoryFilters}&populate[0]=img&populate[1]=detail_img`;
 
         const response = await fetchWithCache(
           `products-by-category-ids:${categoryIds.join(",")}`,

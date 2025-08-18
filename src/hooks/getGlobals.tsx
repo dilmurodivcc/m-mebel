@@ -56,7 +56,7 @@ export interface DefaultSeo {
   id: number;
   metaTitle: string;
   metaDescription: string;
-  keywords: null;
+  keywords: string;
 }
 
 export interface SocialMediaLinks {
@@ -83,6 +83,7 @@ export interface Global {
   publishedAt: string;
   favicon: GlobalImage;
   heroImage?: GlobalImage;
+  seoImg?: GlobalImage;
   defaultSeo: DefaultSeo;
   Social_Media_Links: SocialMediaLinks;
   Phone_Numbers: PhoneNumbers;
@@ -110,9 +111,9 @@ export const useGetGlobals = () => {
         setLoading(true);
         setError(null);
         const response = await fetchWithCache(
-          "globals?populate=favicon",
+          "globals?populate=deep",
           () =>
-            API.get("/api/global?populate=favicon", {
+            API.get("/api/global?populate[0]=favicon&populate[1]=heroImage&populate[2]=defaultSeo&populate[3]=Social_Media_Links&populate[4]=Phone_Numbers&populate[5]=seoImg", {
               signal: controller.signal,
             }).then((r) => r),
           5 * 60 * 1000
@@ -160,6 +161,7 @@ export const useGetSiteInfo = () => {
     siteDescription: data?.data?.siteDescription,
     favicon: data?.data?.favicon,
     heroImage: data?.data?.heroImage,
+    seoImg: data?.data?.seoImg,
     defaultSeo: data?.data?.defaultSeo,
     loading,
     error,

@@ -3,7 +3,7 @@
 import "../i18n";
 import { useTranslation } from "react-i18next";
 import ClientLayout from "../components/layout/ClientLayout";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useGetProducts } from "@/hooks/getProducts";
@@ -24,6 +24,7 @@ export const dynamic = "force-dynamic";
 export default function Home() {
   const { t } = useTranslation();
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
 
   // API hooks
   const {
@@ -41,6 +42,11 @@ export default function Home() {
     loading: siteInfoLoading,
     error: siteInfoError,
   } = useGetSiteInfo();
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Get products from API
   const products = productsData?.data || [];
@@ -85,15 +91,21 @@ export default function Home() {
           <section className="hero-section">
             <div className="hero-content fallback">
               <div className="container">
-                <h1>{t("heroTitle")}</h1>
-                <p>{t("heroSubtitle")}</p>
+                <h1 suppressHydrationWarning>
+                  {isClient ? t("heroTitle") : "Loading..."}
+                </h1>
+                <p suppressHydrationWarning>
+                  {isClient ? t("heroSubtitle") : "Loading..."}
+                </p>
               </div>
             </div>
           </section>
 
           <section className="featured-collections">
             <div className="container">
-              <h2>{t("featuredCollections")}</h2>
+              <h2 suppressHydrationWarning>
+                {isClient ? t("featuredCollections") : "Loading..."}
+              </h2>
               <div className="collections-grid">
                 <SkeletonGrid count={4} type="collection" />
               </div>
@@ -102,7 +114,9 @@ export default function Home() {
 
           <section className="shop-category">
             <div className="container">
-              <h2>{t("shopByCategory")}</h2>
+              <h2 suppressHydrationWarning>
+                {isClient ? t("shopByCategory") : "Loading..."}
+              </h2>
               <div className="category-grid">
                 <SkeletonGrid count={6} type="category" />
               </div>
@@ -111,7 +125,9 @@ export default function Home() {
 
           <section className="new-arrivals">
             <div className="container">
-              <h2>{t("newArrivals")}</h2>
+              <h2 suppressHydrationWarning>
+                {isClient ? t("newArrivals") : "Loading..."}
+              </h2>
               <div className="collections-grid">
                 <SkeletonGrid count={4} type="collection" />
               </div>
@@ -127,12 +143,21 @@ export default function Home() {
     return (
       <ClientLayout showHeader={true} showFooter={true}>
         <main className="home-page">
-          <div style={{ textAlign: "center", padding: "50px" }}>
-            <h2>Error loading data</h2>
-            {productsError && <p>Products error: {productsError}</p>}
-            {categoriesError && <p>Categories error: {categoriesError}</p>}
-            {siteInfoError && <p>Site info error: {siteInfoError}</p>}
-            <button onClick={() => window.location.reload()}>Retry</button>
+          <div className="empty-state">
+            <div className="empty-icon">⚠️</div>
+            <h2 className="empty-title">Error loading data</h2>
+            <p className="empty-description">
+              {productsError && `Products error: ${productsError}`}
+              {categoriesError && `Categories error: ${categoriesError}`}
+              {siteInfoError && `Site info error: ${siteInfoError}`}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="primary-btn"
+              style={{ marginTop: "16px" }}
+            >
+              Retry
+            </button>
           </div>
         </main>
       </ClientLayout>
@@ -155,16 +180,24 @@ export default function Home() {
               </div>
               <div className="hero-content">
                 <div className="container">
-                  <h1>{t("heroTitle")}</h1>
-                  <p>{t("heroSubtitle")}</p>
+                  <h1 suppressHydrationWarning>
+                    {isClient ? t("heroTitle") : "Loading..."}
+                  </h1>
+                  <p suppressHydrationWarning>
+                    {isClient ? t("heroSubtitle") : "Loading..."}
+                  </p>
                 </div>
               </div>
             </>
           ) : (
             <div className="hero-content fallback">
               <div className="container">
-                <h1>{t("heroTitle")}</h1>
-                <p>{t("heroSubtitle")}</p>
+                <h1 suppressHydrationWarning>
+                  {isClient ? t("heroTitle") : "Loading..."}
+                </h1>
+                <p suppressHydrationWarning>
+                  {isClient ? t("heroSubtitle") : "Loading..."}
+                </p>
               </div>
             </div>
           )}
@@ -172,10 +205,12 @@ export default function Home() {
 
         <section className="featured-collections">
           <div className="container">
-            <h2>{t("featuredCollections")}</h2>
+            <h2 suppressHydrationWarning>
+              {isClient ? t("featuredCollections") : "Loading..."}
+            </h2>
             <div className="collections-grid">
               {productsLoading ? (
-                <SkeletonGrid count={3} type="collection" />
+                <SkeletonGrid count={4} type="collection" />
               ) : (
                 featuredProducts.map((product) => (
                   <Link
@@ -189,12 +224,19 @@ export default function Home() {
                       <img
                         src={getImageUrl(product.img?.url)}
                         alt={product.title}
+                        onError={(e) => {
+                          e.currentTarget.src = "/img/cardimg.png";
+                        }}
                       />
                     </div>
                     <div className="card-content">
-                      <h3>{product.title}</h3>
+                      <h3 suppressHydrationWarning>
+                        {isClient ? product.title : "Loading..."}
+                      </h3>
                       <p className="product-price">
-                        {formatPriceNumber(product.price)}
+                        {isClient && product.price
+                          ? formatPriceNumber(product.price)
+                          : "Loading..."}
                       </p>
                     </div>
                   </Link>
@@ -206,7 +248,9 @@ export default function Home() {
 
         <section className="shop-category">
           <div className="container">
-            <h2>{t("shopByCategory")}</h2>
+            <h2 suppressHydrationWarning>
+              {isClient ? t("shopByCategory") : "Loading..."}
+            </h2>
             <div className="category-grid">
               {categoriesLoading ? (
                 <SkeletonGrid count={6} type="category" />
@@ -216,14 +260,20 @@ export default function Home() {
                     href={`/category?category=${category.slug}`}
                     key={category.id}
                     className="category-card"
+                    onClick={handleProductClick}
                   >
                     <div className="category-image">
                       <img
                         src={getImageUrl(category.image?.url)}
                         alt={category.name}
+                        onError={(e) => {
+                          e.currentTarget.src = "/img/cardimg.png";
+                        }}
                       />
                     </div>
-                    <h3>{category.name}</h3>
+                    <h3 suppressHydrationWarning>
+                      {isClient ? category.name : "Loading..."}
+                    </h3>
                   </Link>
                 ))
               )}
@@ -233,10 +283,12 @@ export default function Home() {
 
         <section className="new-arrivals">
           <div className="container">
-            <h2>{t("newArrivals")}</h2>
+            <h2 suppressHydrationWarning>
+              {isClient ? t("newArrivals") : "Loading..."}
+            </h2>
             <div className="collections-grid">
               {productsLoading ? (
-                <SkeletonGrid count={3} type="collection" />
+                <SkeletonGrid count={4} type="collection" />
               ) : (
                 newArrivalsProducts.map((product) => (
                   <Link
@@ -250,12 +302,19 @@ export default function Home() {
                       <img
                         src={getImageUrl(product.img?.url)}
                         alt={product.title}
+                        onError={(e) => {
+                          e.currentTarget.src = "/img/cardimg.png";
+                        }}
                       />
                     </div>
                     <div className="card-content">
-                      <h3>{product.title}</h3>
+                      <h3 suppressHydrationWarning>
+                        {isClient ? product.title : "Loading..."}
+                      </h3>
                       <p className="product-price">
-                        {formatPriceNumber(product.price)}
+                        {isClient && product.price
+                          ? formatPriceNumber(product.price)
+                          : "Loading..."}
                       </p>
                     </div>
                   </Link>

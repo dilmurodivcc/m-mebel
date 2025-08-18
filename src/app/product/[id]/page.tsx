@@ -1,7 +1,7 @@
 "use client";
 
 import ClientLayout from "@/components/layout/ClientLayout";
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { LuSunMedium, LuMoon } from "react-icons/lu";
@@ -20,21 +20,88 @@ const ProductDetail = () => {
   const { theme, toggleTheme } = useThemeStore();
   const [selectedImage, setSelectedImage] = useState(0);
   const [showContactInfo, setShowContactInfo] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   const documentId = params.id as string;
   const { data: productData, loading, error } = useGetProduct(documentId);
   const product = productData?.data;
 
-  const productNameKey = useMemo(() => product?.title, [product?.title]);
+  // Get product images from API or use default
+  const getProductImages = () => {
+    if (!product) {
+      return [
+        "/img/cardimg.png",
+        "/img/cardimg.png",
+        "/img/cardimg.png",
+        "/img/cardimg.png",
+      ];
+    }
 
-  const productDescriptionKey = useMemo(
-    () => product?.description,
-    [product?.description]
-  );
+    const images = [];
+
+    // Add main product image if available
+    if (product.img && product.img.url) {
+      try {
+        images.push(getImageUrl(product.img.url));
+      } catch (error) {
+        console.warn("Error processing main image:", error);
+      }
+    }
+
+    // Add detail images if available
+    if (
+      product.detail_img &&
+      Array.isArray(product.detail_img) &&
+      product.detail_img.length > 0
+    ) {
+      product.detail_img.forEach((detailImg) => {
+        if (detailImg && detailImg.url) {
+          try {
+            images.push(getImageUrl(detailImg.url));
+          } catch (error) {
+            console.warn("Error processing detail image:", error);
+          }
+        }
+      });
+    }
+
+    // If no images available, use default
+    if (images.length === 0) {
+      return [
+        "/img/cardimg.png",
+        "/img/cardimg.png",
+        "/img/cardimg.png",
+        "/img/cardimg.png",
+      ];
+    }
+
+    return images;
+  };
+
+  const productImages = getProductImages();
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Reset selected image when product changes
+  useEffect(() => {
+    setSelectedImage(0);
+  }, [product?.id]);
+
+  // Ensure selectedImage is within bounds
+  useEffect(() => {
+    if (productImages.length > 0 && selectedImage >= productImages.length) {
+      setSelectedImage(0);
+    }
+  }, [productImages.length, selectedImage]);
+
+  const productNameKey = product?.title;
+  const productDescriptionKey = product?.description;
 
   const handleContactClick = useCallback(() => {
     setShowContactInfo(!showContactInfo);
-
   }, [showContactInfo]);
 
   if (loading) {
@@ -63,27 +130,6 @@ const ProductDetail = () => {
       </ClientLayout>
     );
   }
-
-  // Get product images from API or use default
-  const productImages = product?.img
-    ? [
-        getImageUrl(product.img.url),
-        product.img.formats?.large?.url
-          ? getImageUrl(product.img.formats.large.url)
-          : getImageUrl(product.img.url),
-        product.img.formats?.medium?.url
-          ? getImageUrl(product.img.formats.medium.url)
-          : getImageUrl(product.img.url),
-        product.img.formats?.small?.url
-          ? getImageUrl(product.img.formats.small.url)
-          : getImageUrl(product.img.url),
-      ]
-    : [
-        "/img/cardimg.png",
-        "/img/cardimg.png",
-        "/img/cardimg.png",
-        "/img/cardimg.png",
-      ];
 
   return (
     <ClientLayout showHeader={false} showFooter={false}>
@@ -115,9 +161,12 @@ const ProductDetail = () => {
 
         <nav className="breadcrumb">
           <span className="breadcrumb-main">{t("breadcrumbMain")}</span> /{" "}
-          <span className="breadcrumb-category">{product.material}</span> /{" "}
-          <span className="breadcrumb-current">
-            {productNameKey || product.title}
+          <span className="breadcrumb-category">{product?.material || ""}</span>{" "}
+          /{" "}
+          <span className="breadcrumb-current" suppressHydrationWarning>
+            {isClient
+              ? productNameKey || product?.title || "Loading..."
+              : "Loading..."}
           </span>
         </nav>
 
@@ -126,42 +175,65 @@ const ProductDetail = () => {
           <div className="product-images">
             <div className="main-image">
               <img
-                src={productImages[selectedImage]}
-                alt={product.title}
+                src={
+                  (productImages.length > 0 && productImages[selectedImage]) ||
+                  (productImages.length > 0 && productImages[0]) ||
+                  "/img/cardimg.png"
+                }
+                alt={product?.title || "Product"}
                 className="product-main-img"
+                onError={(e) => {
+                  e.currentTarget.src = "/img/cardimg.png";
+                }}
+                loading="eager"
               />
             </div>
             <div className="image-thumbnails">
-              {productImages.map((img, idx) => (
-                <img
-                  key={idx}
-                  src={img}
-                  alt={`${product.title} ${idx + 1}`}
-                  className={`thumbnail${
-                    selectedImage === idx ? " active" : ""
-                  }`}
-                  onClick={() => setSelectedImage(idx)}
-                />
-              ))}
+              {productImages.length > 0 &&
+                productImages.map((img, idx) => (
+                  <img
+                    key={idx}
+                    src={img}
+                    alt={`${product?.title || "Product"} ${idx + 1}`}
+                    className={`thumbnail${
+                      selectedImage === idx ? " active" : ""
+                    }`}
+                    onClick={() => setSelectedImage(idx)}
+                    onError={(e) => {
+                      e.currentTarget.src = "/img/cardimg.png";
+                    }}
+                    loading="lazy"
+                  />
+                ))}
             </div>
           </div>
 
           {/* Product Info */}
           <div className="product-info">
-            <h1 className="product-title">{productNameKey || product.title}</h1>
+            <h1 className="product-title" suppressHydrationWarning>
+              {isClient
+                ? productNameKey || product?.title || "Loading..."
+                : "Loading..."}
+            </h1>
             <div className="product-price">
-              {formatPriceNumber(product.price)}
+              {product?.price ? formatPriceNumber(product.price) : "Loading..."}
             </div>
 
             <div className="product-description">
               <h3>{t("description")}</h3>
-              <p>{productDescriptionKey || product.description}</p>
+              <p suppressHydrationWarning>
+                {isClient
+                  ? productDescriptionKey ||
+                    product?.description ||
+                    "Loading..."
+                  : "Loading..."}
+              </p>
             </div>
 
             <div className="product-specs">
               <h3>{t("specifications")}</h3>
               <div className="specs-grid">
-                {product.SizesOfProduct && (
+                {product?.SizesOfProduct && (
                   <>
                     <div className="spec-item">
                       <span className="spec-label">{t("height")}</span>
@@ -185,16 +257,24 @@ const ProductDetail = () => {
                 )}
                 <div className="spec-item">
                   <span className="spec-label">{t("materials")}</span>
-                  <span className="spec-value">{product.material}</span>
+                  <span className="spec-value">
+                    {product?.material || "N/A"}
+                  </span>
                 </div>
                 <div className="spec-item">
                   <span className="spec-label">{t("quantity")}</span>
-                  <span className="spec-value">{product.quantity}</span>
+                  <span className="spec-value">
+                    {product?.quantity || "N/A"}
+                  </span>
                 </div>
                 <div className="spec-item">
                   <span className="spec-label">{t("delivery")}</span>
                   <span className="spec-value">
-                    {product.delivery ? t("available") : t("notAvailable")}
+                    {product?.delivery !== undefined
+                      ? product.delivery
+                        ? t("available")
+                        : t("notAvailable")
+                      : "N/A"}
                   </span>
                 </div>
               </div>
@@ -204,7 +284,9 @@ const ProductDetail = () => {
               <h3>{t("orderingInfo")}</h3>
               <p className="ordering-text">
                 {t("orderingText", {
-                  productName: productNameKey || product.title,
+                  productName: isClient
+                    ? productNameKey || product?.title || "Loading..."
+                    : "Loading...",
                 })}
               </p>
 

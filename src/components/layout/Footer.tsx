@@ -26,7 +26,6 @@ const Footer = () => {
   const { socialMedia } = useGetSocialMediaLinks();
   const { phoneNumbers } = useGetPhoneNumbers();
 
-  // Get data from API
   const categories = categoriesData?.data || [];
 
   return (
