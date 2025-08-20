@@ -3,6 +3,7 @@
 import ClientLayout from "@/components/layout/ClientLayout";
 import React, { useState, useCallback, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { LuSunMedium, LuMoon } from "react-icons/lu";
 import { useThemeStore } from "@/app/theme/store";
@@ -138,7 +139,7 @@ const ProductDetail = () => {
           <button
             className="back-btn"
             onClick={() => router.back()}
-            aria-label="Go back"
+            aria-label={t("goBack")}
           >
             <MdKeyboardArrowLeft size={24} />
             {t("backButton")}
@@ -150,7 +151,7 @@ const ProductDetail = () => {
             <button
               className="primary-btn"
               onClick={toggleTheme}
-              aria-label="Theme changer"
+              aria-label={t("themeChanger")}
             >
               {theme === "light" ? <LuSunMedium /> : <LuMoon />}
             </button>
@@ -159,13 +160,23 @@ const ProductDetail = () => {
         </div>
 
         <nav className="breadcrumb">
-          <span className="breadcrumb-main">{t("breadcrumbMain")}</span> /{" "}
-          <span className="breadcrumb-category">{product?.material || ""}</span>{" "}
+          <Link href="/" className="breadcrumb-main">
+            {t("breadcrumbMain")}
+          </Link>{" "}
+          /{" "}
+          <Link
+            href={`/category?category=${
+              product?.material?.toLowerCase() || ""
+            }`}
+            className="breadcrumb-category"
+          >
+            {product?.material || ""}
+          </Link>{" "}
           /{" "}
           <span className="breadcrumb-current" suppressHydrationWarning>
             {isClient
-              ? productNameKey || product?.title || "Loading..."
-              : "Loading..."}
+              ? productNameKey || product?.title || t("loading")
+              : t("loading")}
           </span>
         </nav>
 
@@ -179,7 +190,7 @@ const ProductDetail = () => {
                   (productImages.length > 0 && productImages[0]) ||
                   "/img/cardimg.png"
                 }
-                alt={product?.title || "Product"}
+                alt={product?.title || t("product")}
                 className="product-main-img"
                 onError={(e) => {
                   e.currentTarget.src = "/img/cardimg.png";
@@ -193,7 +204,7 @@ const ProductDetail = () => {
                   <img
                     key={idx}
                     src={img}
-                    alt={`${product?.title || "Product"} ${idx + 1}`}
+                    alt={`${product?.title || t("product")} ${idx + 1}`}
                     className={`thumbnail${
                       selectedImage === idx ? " active" : ""
                     }`}
@@ -211,11 +222,11 @@ const ProductDetail = () => {
           <div className="product-info">
             <h1 className="product-title" suppressHydrationWarning>
               {isClient
-                ? productNameKey || product?.title || "Loading..."
-                : "Loading..."}
+                ? productNameKey || product?.title || t("loading")
+                : t("loading")}
             </h1>
             <div className="product-price">
-              {product?.price ? formatPriceNumber(product.price) : "Loading..."}
+              {product?.price ? formatPriceNumber(product.price) : t("loading")}
             </div>
 
             <div className="product-description">
@@ -224,8 +235,8 @@ const ProductDetail = () => {
                 {isClient
                   ? productDescriptionKey ||
                     product?.description ||
-                    "Loading..."
-                  : "Loading..."}
+                    t("loading")
+                  : t("loading")}
               </p>
             </div>
 
@@ -237,19 +248,19 @@ const ProductDetail = () => {
                     <div className="spec-item">
                       <span className="spec-label">{t("height")}</span>
                       <span className="spec-value">
-                        {product.SizesOfProduct.height} cm
+                        {product.SizesOfProduct.height} 
                       </span>
                     </div>
                     <div className="spec-item">
                       <span className="spec-label">{t("width")}</span>
                       <span className="spec-value">
-                        {product.SizesOfProduct.width} cm
+                        {product.SizesOfProduct.width} 
                       </span>
                     </div>
                     <div className="spec-item">
                       <span className="spec-label">{t("depth")}</span>
                       <span className="spec-value">
-                        {product.SizesOfProduct.depth} cm
+                        {product.SizesOfProduct.depth} 
                       </span>
                     </div>
                   </>
@@ -284,8 +295,8 @@ const ProductDetail = () => {
               <p className="ordering-text">
                 {t("orderingText", {
                   productName: isClient
-                    ? productNameKey || product?.title || "Loading..."
-                    : "Loading...",
+                    ? productNameKey || product?.title || t("loading")
+                    : t("loading"),
                 })}
               </p>
 

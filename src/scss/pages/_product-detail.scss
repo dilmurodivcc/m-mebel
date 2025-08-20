@@ -47,9 +47,27 @@
 
 .breadcrumb-main {
   color: var(--text-tertiary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
 }
 
-.breadcrumb-category,
+.breadcrumb-category {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--bg-tertiary);
+    text-decoration: underline;
+  }
+}
+
 .breadcrumb-current {
   color: var(--text);
   font-weight: 600;

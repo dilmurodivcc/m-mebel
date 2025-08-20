@@ -441,7 +441,10 @@ const Category = () => {
     <ClientLayout showHeader={true} showFooter={true}>
       <main className="category-page">
         <nav className="breadcrumb">
-          <span className="breadcrumb-main">{t("breadcrumbMain")}</span> /{" "}
+          <Link href="/" className="breadcrumb-main">
+            {t("breadcrumbMain")}
+          </Link>{" "}
+          /{" "}
           <span className="breadcrumb-current">
             {selectedCategories.length > 0
               ? selectedCategories.length === 1
