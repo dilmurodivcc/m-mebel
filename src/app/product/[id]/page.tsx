@@ -28,7 +28,6 @@ const ProductDetail = () => {
   const { data: productData, loading, error } = useGetProduct(documentId);
   const product = productData?.data;
 
-  // Get product images from API or use default
   const getProductImages = () => {
     if (!product) {
       return [
@@ -41,7 +40,6 @@ const ProductDetail = () => {
 
     const images = [];
 
-    // Add main product image if available
     if (product.img && product.img.url) {
       try {
         images.push(getImageUrl(product.img.url));
@@ -50,7 +48,6 @@ const ProductDetail = () => {
       }
     }
 
-    // Add detail images if available
     if (
       product.detail_img &&
       Array.isArray(product.detail_img) &&
@@ -67,7 +64,6 @@ const ProductDetail = () => {
       });
     }
 
-    // If no images available, use default
     if (images.length === 0) {
       return [
         "/img/cardimg.png",
@@ -82,17 +78,14 @@ const ProductDetail = () => {
 
   const productImages = getProductImages();
 
-  // Prevent hydration mismatch
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // Reset selected image when product changes
   useEffect(() => {
     setSelectedImage(0);
   }, [product?.id]);
 
-  // Ensure selectedImage is within bounds
   useEffect(() => {
     if (productImages.length > 0 && selectedImage >= productImages.length) {
       setSelectedImage(0);
@@ -135,7 +128,6 @@ const ProductDetail = () => {
     <ClientLayout showHeader={false} showFooter={false}>
       <main className="product-detail-page">
         <div className="actions">
-          {/* Back button */}
           <button
             className="back-btn"
             onClick={() => router.back()}
@@ -181,7 +173,6 @@ const ProductDetail = () => {
         </nav>
 
         <div className="product-detail-content">
-          {/* Product Images */}
           <div className="product-images">
             <div className="main-image">
               <img
@@ -218,7 +209,6 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* Product Info */}
           <div className="product-info">
             <h1 className="product-title" suppressHydrationWarning>
               {isClient

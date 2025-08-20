@@ -118,7 +118,6 @@ export interface SingleProductResponse {
   meta: Record<string, unknown>;
 }
 
-// Hook for getting all products
 export const useGetProducts = () => {
   const [data, setData] = useState<ProductsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -130,7 +129,6 @@ export const useGetProducts = () => {
     const controller = new AbortController();
 
     const fetchProducts = async () => {
-      // Cache for 2 minutes for faster updates
       const now = Date.now();
       if (data && now - lastFetch < 2 * 60 * 1000) {
         setLoading(false);
@@ -148,7 +146,7 @@ export const useGetProducts = () => {
             API.get("/api/products?populate[0]=img&populate[1]=detail_img", {
               signal: controller.signal,
             }).then((r) => r),
-          2 * 60 * 1000 // Reduced cache time
+          2 * 60 * 1000 
         );
 
         if (!isMounted) return;

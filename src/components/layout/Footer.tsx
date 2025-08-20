@@ -27,8 +27,7 @@ const Footer = () => {
 
   const categories = categoriesData?.data || [];
 
-  // Prevent hydration mismatch
-  useEffect(() => {
+    useEffect(() => {
     setIsClient(true);
   }, []);
 

@@ -14,7 +14,6 @@ const resources = {
   }
 };
 
-// Function to get stored language
 const getStoredLanguage = (): string => {
   if (typeof window !== 'undefined') {
     const stored = localStorage.getItem('theme-storage');
@@ -36,7 +35,7 @@ i18n
   .init({
     resources,
     fallbackLng: "ru",
-    lng: getStoredLanguage(), // Set initial language from store
+    lng: getStoredLanguage(), 
     debug: false,
     interpolation: {
       escapeValue: false,
@@ -45,7 +44,6 @@ i18n
       order: ["localStorage", "navigator"],
       caches: ["localStorage"],
     },
-    // Performance optimizations
     react: {
       useSuspense: false,
     },

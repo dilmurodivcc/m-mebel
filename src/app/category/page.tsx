@@ -38,7 +38,6 @@ const sortOptions = [
   { value: "desc", label: "priceHighToLow" },
 ];
 
-// Pagination helpers
 function getPagination(current: number, total: number) {
   const delta = 2;
   const range = [];
@@ -69,7 +68,6 @@ function getPagination(current: number, total: number) {
   return rangeWithDots;
 }
 
-// Memoized category button component
 const CategoryButton = React.memo(
   ({
     cat,
@@ -103,7 +101,6 @@ const CategoryButton = React.memo(
 );
 CategoryButton.displayName = "CategoryButton";
 
-// Memoized product card component
 type ProductForCard = {
   id: number;
   documentId: string;
@@ -164,7 +161,6 @@ const Category = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Store state
   const selectedCategories = useCategoryStore((s) => s.selectedCategories);
   const setSelectedCategories = useCategoryStore(
     (s) => s.setSelectedCategories
@@ -182,10 +178,8 @@ const Category = () => {
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Get category slug from URL
   const categorySlug = searchParams.get("category");
 
-  // API hooks
   const { data: categoriesData, loading: categoriesLoading } =
     useGetCategories();
   const { data: productsByCategoryData, loading: categoryProductsLoading } =
@@ -193,13 +187,11 @@ const Category = () => {
   const { data: allProductsData, loading: allProductsLoading } =
     useGetProducts();
 
-  // Get data from API
   const categories = useMemo(
     () => categoriesData?.data || [],
     [categoriesData?.data]
   );
 
-  // Get category IDs for selected categories
   const selectedCategoryIds = useMemo(() => {
     return selectedCategories
       .map((catName) => {
@@ -209,7 +201,6 @@ const Category = () => {
       .filter((id) => id !== undefined) as number[];
   }, [selectedCategories, categories]);
 
-  // Hook for multiple category products
   const {
     data: productsByMultipleCategoriesData,
     loading: multipleCategoriesLoading,
@@ -223,7 +214,6 @@ const Category = () => {
     [allProductsData?.data]
   );
 
-  // Sync URL params with store state
   useEffect(() => {
     if (categorySlug) {
       const category = categories.find((cat) => cat.slug === categorySlug);
@@ -232,13 +222,11 @@ const Category = () => {
         setSelectedCategories([category.name]);
       }
     } else {
-      // Clear category selection when no slug in URL
       setSelectedCategory("");
       setSelectedCategories([]);
     }
   }, [categorySlug, categories, setSelectedCategory, setSelectedCategories]);
 
-  // Click outside handler for dropdown
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -256,29 +244,23 @@ const Category = () => {
     }
   }, [sortDropdownOpen]);
 
-  // Hydrate the store on client-side
   useEffect(() => {
     useCategoryStore.persist.rehydrate();
   }, []);
 
-  // Prefetch data for faster navigation
   useEffect(() => {
     if (categorySlug) {
-      // Prefetch related data
       router.prefetch(`/category?category=${categorySlug}`);
     }
   }, [categorySlug, router]);
 
-  // Determine which products to use based on category selection
   const products = useMemo(() => {
-    // If we have multiple selected categories, use API data
     if (selectedCategories.length > 1) {
       const multipleCategoriesProducts =
         productsByMultipleCategoriesData?.data || [];
       return multipleCategoriesProducts;
     }
 
-    // If we have a single category slug and products from that category API, use them
     if (
       categorySlug &&
       productsByCategory.length > 0 &&
@@ -287,7 +269,6 @@ const Category = () => {
       return productsByCategory;
     }
 
-    // If we have selected categories but no category slug (fallback filtering)
     if (selectedCategories.length === 1) {
       const filtered = allProducts.filter((product: ProductForCard) => {
         const materialMatch = product.material === selectedCategories[0];
@@ -296,7 +277,6 @@ const Category = () => {
       return filtered;
     }
 
-    // Show all products if no category is selected
     return allProducts;
   }, [
     categorySlug,
@@ -349,7 +329,6 @@ const Category = () => {
           setSelectedCategory("");
           router.push("/category");
         } else {
-          // Keep multiple categories selected, don't update URL for multiple selection
           setSelectedCategory(newCategories.join(", "));
         }
       } else {
@@ -359,16 +338,13 @@ const Category = () => {
         ];
         setSelectedCategories(newCategories);
 
-        // Update selected category display
         if (newCategories.length === 1) {
           setSelectedCategory(cat);
-          // Update URL only for single category
           const categoryObj = categories.find((c) => c.name === cat);
           if (categoryObj) {
             router.push(`/category?category=${categoryObj.slug}`);
           }
         } else {
-          // For multiple categories, don't update URL but show combined name
           setSelectedCategory(newCategories.join(", "));
         }
       }
@@ -385,7 +361,6 @@ const Category = () => {
     ]
   );
 
-  // Optimized remove category handler
   const handleRemoveCategory = useCallback(
     (cat: string) => {
       const newCategories = selectedCategories.filter((c) => c !== cat);
@@ -395,10 +370,8 @@ const Category = () => {
         setSelectedCategory("");
         router.push("/category");
       } else {
-        // Update selected category display
         if (newCategories.length === 1) {
           setSelectedCategory(newCategories[0]);
-          // Update URL with the remaining category
           const categoryObj = categories.find(
             (c) => c.name === newCategories[0]
           );
@@ -406,7 +379,6 @@ const Category = () => {
             router.push(`/category?category=${categoryObj.slug}`);
           }
         } else {
-          // For multiple categories, don't update URL but show combined name
           setSelectedCategory(newCategories.join(", "));
         }
       }
@@ -423,7 +395,6 @@ const Category = () => {
     ]
   );
 
-  // Error state for categories - only show after a reasonable delay
   if (!categoriesLoading && !categories.length && categoriesData === null) {
     return (
       <ClientLayout showHeader={true} showFooter={true}>
@@ -548,8 +519,7 @@ const Category = () => {
               : "products-list category-products-list"
           }
         >
-          {/* Loading states for different scenarios */}
-          {categoriesLoading ? (
+            {categoriesLoading ? (
             <SkeletonGrid count={3} type="product" layout={layout} />
           ) : allProductsLoading && selectedCategories.length === 0 ? (
             <SkeletonGrid count={3} type="product" layout={layout} />

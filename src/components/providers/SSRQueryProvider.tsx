@@ -29,7 +29,6 @@ export default function SSRQueryProvider({
     setMounted(true);
   }, []);
 
-  // During SSR, render children without QueryClientProvider
   if (!mounted) {
     return <>{children}</>;
   }

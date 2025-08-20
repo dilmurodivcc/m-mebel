@@ -37,7 +37,6 @@ export const useCategoryStore = create<CategoryState>()(
         partialize: (state) => ({
           layout: state.layout,
         }),
-        // Skip hydration until client-side
         skipHydration: true,
       }
     )

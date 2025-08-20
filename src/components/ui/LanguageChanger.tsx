@@ -51,16 +51,12 @@ const LanguageChanger = ({ className = "" }) => {
   }, [isDropdownOpen]);
 
   const handleLanguageChange = (languageCode: string) => {
-    // Update i18n language
     i18n.changeLanguage(languageCode);
 
-    // Update store language
     setLanguage(languageCode as "uz" | "ru");
 
-    // Close dropdown
     setIsDropdownOpen(false);
 
-    // Reload page to update API locale parameter
     setTimeout(() => {
       window.location.reload();
     }, 100);

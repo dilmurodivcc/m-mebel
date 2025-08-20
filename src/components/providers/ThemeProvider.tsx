@@ -13,7 +13,6 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
 
   useEffect(() => {
     setMounted(true);
-    // Set initial theme immediately
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
@@ -23,7 +22,5 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
     }
   }, [theme, mounted]);
 
-  // Return children even when not mounted to prevent React errors
-  // The theme will be applied once mounted
   return <>{children}</>;
 }

@@ -8,12 +8,10 @@ import {
   SingleProductResponse,
 } from "./getProducts";
 
-// Helper function to safely get products data
 const getProductsData = (data: ProductsResponse | undefined): Product[] => {
   return data?.data || [];
 };
 
-// Fetch function for all products
 const fetchAllProducts = async (): Promise<ProductsResponse> => {
   try {
     const response = await API.get(
@@ -29,7 +27,6 @@ const fetchAllProducts = async (): Promise<ProductsResponse> => {
   }
 };
 
-// Fetch function for products by category slug
 const fetchProductsByCategorySlug = async (
   categorySlug: string
 ): Promise<ProductsResponse> => {
@@ -47,7 +44,6 @@ const fetchProductsByCategorySlug = async (
   }
 };
 
-// Fetch function for products by multiple category IDs
 const fetchProductsByCategoryIds = async (
   categoryIds: number[]
 ): Promise<ProductsResponse> => {
@@ -75,57 +71,50 @@ const fetchProductsByCategoryIds = async (
   }
 };
 
-// Hook for all products
 export const useAllProducts = () => {
   return useQuery<ProductsResponse>({
     queryKey: ["products", "all"],
     queryFn: fetchAllProducts,
     enabled: typeof window !== "undefined",
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 5 * 60 * 1000, 
+    gcTime: 10 * 60 * 1000, 
     retry: (failureCount) => {
-      // Don't retry on 404 or network errors during SSR
       if (typeof window === "undefined") return false;
       return failureCount < 2;
     },
   });
 };
 
-// Hook for products by category slug with keepPreviousData
 export const useProductsByCategorySlug = (categorySlug: string) => {
   return useQuery<ProductsResponse>({
     queryKey: ["products", "category-slug", categorySlug],
     queryFn: () => fetchProductsByCategorySlug(categorySlug),
     enabled: !!categorySlug && typeof window !== "undefined",
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
-    placeholderData: keepPreviousData, // Keep previous data while fetching new data
+    staleTime: 5 * 60 * 1000, 
+    gcTime: 10 * 60 * 1000, 
+    placeholderData: keepPreviousData, 
     retry: (failureCount) => {
-      // Don't retry on 404 or network errors during SSR
       if (typeof window === "undefined") return false;
       return failureCount < 2;
     },
   });
 };
 
-// Hook for products by multiple category IDs with keepPreviousData
 export const useProductsByCategoryIds = (categoryIds: number[]) => {
   return useQuery<ProductsResponse>({
     queryKey: ["products", "category-ids", categoryIds],
     queryFn: () => fetchProductsByCategoryIds(categoryIds),
     enabled: categoryIds.length > 0 && typeof window !== "undefined",
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
-    placeholderData: keepPreviousData, // Keep previous data while fetching new data
+    staleTime: 5 * 60 * 1000, 
+    gcTime: 10 * 60 * 1000, 
+    placeholderData: keepPreviousData, 
     retry: (failureCount) => {
-      // Don't retry on 404 or network errors during SSR
       if (typeof window === "undefined") return false;
       return failureCount < 2;
     },
   });
 };
 
-// Hook for products by material
 export const useProductsByMaterial = (material: string) => {
   return useQuery<ProductsResponse>({
     queryKey: ["products", "material", material],
@@ -135,13 +124,12 @@ export const useProductsByMaterial = (material: string) => {
       ).then((r) => r.data);
     },
     enabled: !!material && typeof window !== "undefined",
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 5 * 60 * 1000, 
+    gcTime: 10 * 60 * 1000, 
     placeholderData: keepPreviousData,
   });
 };
 
-// Hook for single product
 export const useProduct = (documentId: string) => {
   return useQuery<SingleProductResponse>({
     queryKey: ["product", documentId],
@@ -151,10 +139,10 @@ export const useProduct = (documentId: string) => {
       ).then((r) => r.data);
     },
     enabled: !!documentId && typeof window !== "undefined",
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 5 * 60 * 1000, 
+    gcTime: 10 * 60 * 1000, 
   });
 };
 
-// Export helper function for safe data access
+
 export { getProductsData };

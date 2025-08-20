@@ -7,7 +7,6 @@ interface SkeletonProps {
   style?: React.CSSProperties;
 }
 
-// Basic skeleton element with pulse animation
 const SkeletonElement: React.FC<SkeletonProps> = ({ className = "", style = {} }) => (
   <div
     className={`skeleton-element ${className}`}
@@ -15,7 +14,6 @@ const SkeletonElement: React.FC<SkeletonProps> = ({ className = "", style = {} }
   />
 );
 
-// Product card skeleton for grid layout
 export const ProductCardSkeleton: React.FC<{ layout?: "grid" | "list" }> = ({ layout = "grid" }) => (
   <div className={`product-card-skeleton ${layout}`}>
     <div className="skeleton-image" />
@@ -29,7 +27,6 @@ export const ProductCardSkeleton: React.FC<{ layout?: "grid" | "list" }> = ({ la
   </div>
 );
 
-// Collection card skeleton for home page
 export const CollectionCardSkeleton: React.FC = () => (
   <div className="collection-card-skeleton">
     <div className="skeleton-image" />
@@ -40,7 +37,6 @@ export const CollectionCardSkeleton: React.FC = () => (
   </div>
 );
 
-// Category card skeleton
 export const CategoryCardSkeleton: React.FC = () => (
   <div className="category-card-skeleton">
     <div className="skeleton-image" />
@@ -48,7 +44,6 @@ export const CategoryCardSkeleton: React.FC = () => (
   </div>
 );
 
-// Product detail skeleton
 export const ProductDetailSkeleton: React.FC = () => (
   <div className="product-detail-skeleton">
     <div className="skeleton-actions">
@@ -82,7 +77,6 @@ export const ProductDetailSkeleton: React.FC = () => (
   </div>
 );
 
-// Grid of skeleton cards
 export const SkeletonGrid: React.FC<{
   count: number;
   type: "product" | "collection" | "category";

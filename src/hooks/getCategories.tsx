@@ -106,7 +106,6 @@ export const useGetCategories = () => {
     const fetchCategories = async () => {
       const now = Date.now();
       if (data && now - lastFetch < 2 * 60 * 1000) {
-        // Reduced cache time
         setLoading(false);
         return;
       }
@@ -122,7 +121,7 @@ export const useGetCategories = () => {
             API.get("/api/categories?populate[0]=image", {
               signal: controller.signal,
             }).then((r) => r),
-          2 * 60 * 1000 // Reduced cache time for faster updates
+          2 * 60 * 1000 
         );
 
         if (!isMounted) return;
@@ -181,7 +180,7 @@ export const useGetCategory = (documentId: string) => {
             API.get(`/api/categories/${documentId}?populate[0]=image`, {
               signal: controller.signal,
             }).then((r) => r),
-          2 * 60 * 1000 // Cache for 2 minutes
+          2 * 60 * 1000 
         );
         setData(response.data);
       } catch (error: unknown) {
@@ -227,7 +226,7 @@ export const useGetCategoriesWithPagination = (
               `/api/categories?populate[0]=image&pagination[page]=${page}&pagination[pageSize]=${pageSize}`,
               { signal: controller.signal }
             ).then((r) => r),
-          1 * 60 * 1000 // Cache for 1 minute
+          1 * 60 * 1000 
         );
         setData(response.data);
       } catch (error: unknown) {
@@ -328,7 +327,7 @@ export const useGetCategoryWithProducts = (slug: string) => {
         const response = await fetchWithCache(
           `category-with-products:${slug}`,
           () => API.get(url, { signal: controller.signal }).then((r) => r),
-          2 * 60 * 1000 // Reduced cache time
+            2 * 60 * 1000 
         );
 
         if (!isMounted) return;

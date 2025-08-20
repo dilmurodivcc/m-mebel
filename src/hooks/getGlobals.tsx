@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import API from "../API";
 import { fetchWithCache } from "@/utils/requestCache";
 
-// Types based on your API response
-export interface GlobalImage {
+  export interface GlobalImage {
   id: number;
   documentId: string;
   name: string;
@@ -94,7 +93,6 @@ export interface GlobalsResponse {
   meta: Record<string, unknown>;
 }
 
-// Hook for getting global settings
 export const useGetGlobals = () => {
   const [data, setData] = useState<GlobalsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -152,7 +150,6 @@ export const useGetGlobals = () => {
   return { data, loading, error };
 };
 
-// Hook for getting specific global data (site info, social media, etc.)
 export const useGetSiteInfo = () => {
   const { data, loading, error } = useGetGlobals();
 
@@ -168,7 +165,6 @@ export const useGetSiteInfo = () => {
   };
 };
 
-// Hook for getting social media links
 export const useGetSocialMediaLinks = () => {
   const { data, loading, error } = useGetGlobals();
 
@@ -178,8 +174,7 @@ export const useGetSocialMediaLinks = () => {
     error,
   };
 };
-
-// Hook for getting phone numbers
+  
 export const useGetPhoneNumbers = () => {
   const { data, loading, error } = useGetGlobals();
 

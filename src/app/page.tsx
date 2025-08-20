@@ -12,7 +12,6 @@ import { useGetSiteInfo } from "@/hooks/getGlobals";
 import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
 import { SkeletonGrid } from "@/components/ui/SkeletonLoader";
 
-// Extend Window interface for setNavigationLoading
 declare global {
   interface Window {
     setNavigationLoading?: (loading: boolean) => void;
@@ -26,7 +25,6 @@ export default function Home() {
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
 
-  // API hooks
   const {
     data: productsData,
     loading: productsLoading,
@@ -43,37 +41,29 @@ export default function Home() {
     error: siteInfoError,
   } = useGetSiteInfo();
 
-  // Prevent hydration mismatch
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // Get products from API
   const products = productsData?.data || [];
 
-  // New arrivals products (last 3 products from the API)
   const newArrivalsProducts = products.slice(-4);
 
-  // Featured products (first 3 products from the API)
   const featuredProducts = products.slice(0, 4);
 
-  // Get categories from API
   const categories = categoriesData?.data || [];
 
   useEffect(() => {
     router.prefetch("/category");
-    // Prefetch product pages for better performance
     newArrivalsProducts.forEach((product) => {
       router.prefetch(`/product/${product.documentId}`);
     });
-    // Prefetch featured product pages
     featuredProducts.forEach((product) => {
       router.prefetch(`/product/${product.documentId}`);
     });
   }, [router, newArrivalsProducts, featuredProducts]);
 
   const handleProductClick = () => {
-    // Use setTimeout to make navigation loading non-blocking
     setTimeout(() => {
       try {
         if (typeof window !== "undefined" && window.setNavigationLoading) {
@@ -83,7 +73,6 @@ export default function Home() {
     }, 0);
   };
 
-  // Loading state
   if (productsLoading || categoriesLoading || siteInfoLoading) {
     return (
       <ClientLayout showHeader={true} showFooter={true}>
@@ -138,7 +127,6 @@ export default function Home() {
     );
   }
 
-  // Error state
   if (productsError || categoriesError || siteInfoError) {
     return (
       <ClientLayout showHeader={true} showFooter={true}>

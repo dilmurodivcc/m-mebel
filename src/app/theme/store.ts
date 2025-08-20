@@ -33,7 +33,6 @@ export const useThemeStore = create<ThemeState>()(
     {
       name: 'theme-storage',
       onRehydrateStorage: () => () => {
-        // Theme will be applied by ThemeProvider
       },
     }
   )

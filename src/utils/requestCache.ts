@@ -1,5 +1,3 @@
-// Simple in-memory request cache with in-flight deduplication
-// Not persisted across reloads; suitable for client-side caching between components
 
 type CacheEntry<T> = {
   expiresAt: number;
@@ -22,7 +20,7 @@ export function clearRequestCache(key?: string) {
 export async function fetchWithCache<T>(
   key: string,
   fetcher: () => Promise<T>,
-  ttlMs: number = 2 * 60 * 1000 // Reduced default cache time
+  ttlMs: number = 2 * 60 * 1000 
 ): Promise<T> {
   const now = Date.now();
 
@@ -50,7 +48,7 @@ export async function fetchWithCache<T>(
   return promise;
 }
 
-// Fast fetch without cache for immediate data
+
 export async function fetchImmediate<T>(
   fetcher: () => Promise<T>
 ): Promise<T> {

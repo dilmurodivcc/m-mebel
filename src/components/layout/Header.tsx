@@ -75,7 +75,6 @@ const Header = () => {
       .slice(0, 5);
   }, [searchQuery, products]);
 
-  // Update search results when filtered results change
   useEffect(() => {
     if (searchQuery.trim().length > 0) {
       setSearchResults(filteredSearchResults);
@@ -117,7 +116,6 @@ const Header = () => {
     }, 200);
   }, []);
 
-  // Click outside handler
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
@@ -134,28 +132,23 @@ const Header = () => {
     }
   }, [showSearchResults]);
 
-  // Prefetch category data on hover
   const handleCategoryHover = useCallback(
     (cat: { name?: string; slug?: string }) => {
       if (!cat?.slug) return;
 
-      // Prefetch the category page data
       router.prefetch(`/category?category=${cat.slug}`);
     },
     [router]
   );
 
-  // Handle category selection
   const handleCategoryClick = useCallback(
     (cat: { name?: string; slug?: string }) => {
       if (!cat?.name || !cat?.slug) {
         return;
       }
 
-      // Update store state
       setSelectedCategory(cat.name);
 
-      // Navigate to category page with proper URL
       router.push(`/category?category=${cat.slug}`);
     },
     [setSelectedCategory, router]
@@ -240,7 +233,7 @@ const Header = () => {
         ) : (
           <ul className="menu-list">
             {categoriesLoading
-              ? // Show skeleton placeholders while loading
+                ? 
                 Array.from({ length: maxCategoryLength }).map((_, index) => (
                   <li key={`loading-category-${index}`}>
                     <div className="header-category-skeleton"></div>
