@@ -130,9 +130,9 @@ export const useGetProducts = () => {
     const controller = new AbortController();
 
     const fetchProducts = async () => {
-      // Cache for 5 minutes
+      // Cache for 2 minutes for faster updates
       const now = Date.now();
-      if (data && now - lastFetch < 5 * 60 * 1000) {
+      if (data && now - lastFetch < 2 * 60 * 1000) {
         setLoading(false);
         return;
       }
@@ -148,7 +148,7 @@ export const useGetProducts = () => {
             API.get("/api/products?populate[0]=img&populate[1]=detail_img", {
               signal: controller.signal,
             }).then((r) => r),
-          5 * 60 * 1000
+          2 * 60 * 1000 // Reduced cache time
         );
 
         if (!isMounted) return;

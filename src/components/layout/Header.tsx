@@ -134,6 +134,17 @@ const Header = () => {
     }
   }, [showSearchResults]);
 
+  // Prefetch category data on hover
+  const handleCategoryHover = useCallback(
+    (cat: { name?: string; slug?: string }) => {
+      if (!cat?.slug) return;
+
+      // Prefetch the category page data
+      router.prefetch(`/category?category=${cat.slug}`);
+    },
+    [router]
+  );
+
   // Handle category selection
   const handleCategoryClick = useCallback(
     (cat: { name?: string; slug?: string }) => {
@@ -150,40 +161,6 @@ const Header = () => {
     [setSelectedCategory, router]
   );
 
-  // Show loading states if needed
-  if (categoriesLoading || productsLoading || siteInfoLoading) {
-    return (
-      <header className="header">
-        <Link href="/" className="logo">
-          <img
-            src={favicon?.url ? getImageUrl(favicon.url) : "/icons/logo.png"}
-            alt="logo"
-            width={120}
-            style={{
-              opacity: siteInfoLoading ? 0.7 : 1,
-              transition: "opacity 0.3s ease",
-            }}
-            suppressHydrationWarning
-          />
-          <h5
-            style={{
-              opacity: siteInfoLoading ? 0.7 : 1,
-              transition: "opacity 0.3s ease",
-            }}
-            suppressHydrationWarning
-          >
-            Loading...
-          </h5>
-        </Link>
-        <nav className="navbar">
-          <div style={{ color: "var(--text-tertiary)", fontSize: "14px" }}>
-            Loading...
-          </div>
-        </nav>
-      </header>
-    );
-  }
-
   return (
     <header className="header">
       <Link href="/" className="logo">
@@ -191,10 +168,20 @@ const Header = () => {
           src={favicon?.url ? getImageUrl(favicon.url) : "/icons/logo.png"}
           alt={isClient ? siteName || "logo" : "logo"}
           width={120}
+          style={{
+            opacity: siteInfoLoading ? 0.7 : 1,
+            transition: "opacity 0.3s ease",
+          }}
           suppressHydrationWarning
         />
-        <h5 suppressHydrationWarning>
-          {isClient ? siteName || t("logo") : "Loading..."}
+        <h5
+          style={{
+            opacity: siteInfoLoading ? 0.7 : 1,
+            transition: "opacity 0.3s ease",
+          }}
+          suppressHydrationWarning
+        >
+          {isClient ? siteName || t("logo") : t("logo")}
         </h5>
       </Link>
       <nav className="navbar">
@@ -252,25 +239,33 @@ const Header = () => {
           </div>
         ) : (
           <ul className="menu-list">
-            {categories.slice(0, maxCategoryLength).map((cat) => (
-              <li key={cat?.id || Math.random()}>
-                <button
-                  className={
-                    selectedCategory === cat?.name ? "active-category" : ""
-                  }
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    color: "inherit",
-                    font: "inherit",
-                  }}
-                  onClick={() => cat && handleCategoryClick(cat)}
-                >
-                  {cat?.name || "Unknown Category"}
-                </button>
-              </li>
-            ))}
+            {categoriesLoading
+              ? // Show skeleton placeholders while loading
+                Array.from({ length: maxCategoryLength }).map((_, index) => (
+                  <li key={`loading-category-${index}`}>
+                    <div className="header-category-skeleton"></div>
+                  </li>
+                ))
+              : categories.slice(0, maxCategoryLength).map((cat) => (
+                  <li key={cat?.id || Math.random()}>
+                    <button
+                      className={
+                        selectedCategory === cat?.name ? "active-category" : ""
+                      }
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        color: "inherit",
+                        font: "inherit",
+                      }}
+                      onClick={() => cat && handleCategoryClick(cat)}
+                      onMouseEnter={() => cat && handleCategoryHover(cat)}
+                    >
+                      {cat?.name || "Unknown Category"}
+                    </button>
+                  </li>
+                ))}
           </ul>
         )}
         <ul className="btn-group">

@@ -25,6 +25,7 @@ import {
 import { useGetCategories } from "@/hooks/getCategories";
 import { useSearchParams, useRouter } from "next/navigation";
 import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
+import { SkeletonGrid } from "@/components/ui/SkeletonLoader";
 
 export const dynamic = "force-dynamic";
 
@@ -120,34 +121,41 @@ const ProductCard = React.memo(
   }: {
     product: ProductForCard;
     layout: "grid" | "list";
-  }) => (
-    <Link
-      href={`/product/${product.documentId}`}
-      className={`product-card category-product-card${
-        layout === "grid" ? " grid" : " list"
-      }`}
-      prefetch={true}
-    >
-      <img
-        src={getImageUrl(product.img?.url)}
-        alt={product.title}
-        className={`category-product-img${
+  }) => {
+    const router = useRouter();
+    return (
+      <Link
+        href={`/product/${product.documentId}`}
+        className={`product-card category-product-card${
           layout === "grid" ? " grid" : " list"
         }`}
-      />
-      <div className="category-product-content">
-        <div className="category-product-name">{product.title}</div>
-        {layout === "list" && (
-          <div className="category-product-description">
-            {product.description}
+        prefetch={true}
+        onMouseEnter={() => {
+          // Prefetch product data on hover
+          router.prefetch(`/product/${product.documentId}`);
+        }}
+      >
+        <img
+          src={getImageUrl(product.img?.url)}
+          alt={product.title}
+          className={`category-product-img${
+            layout === "grid" ? " grid" : " list"
+          }`}
+        />
+        <div className="category-product-content">
+          <div className="category-product-name">{product.title}</div>
+          {layout === "list" && (
+            <div className="category-product-description">
+              {product.description}
+            </div>
+          )}
+          <div className="category-product-price">
+            {formatPriceNumber(product.price)}
           </div>
-        )}
-        <div className="category-product-price">
-          {formatPriceNumber(product.price)}
         </div>
-      </div>
-    </Link>
-  )
+      </Link>
+    );
+  }
 );
 ProductCard.displayName = "ProductCard";
 
@@ -241,6 +249,19 @@ const Category = () => {
         document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [sortDropdownOpen]);
+
+  // Hydrate the store on client-side
+  useEffect(() => {
+    useCategoryStore.persist.rehydrate();
+  }, []);
+
+  // Prefetch data for faster navigation
+  useEffect(() => {
+    if (categorySlug) {
+      // Prefetch related data
+      router.prefetch(`/category?category=${categorySlug}`);
+    }
+  }, [categorySlug, router]);
 
   // Determine which products to use based on category selection
   const products = useMemo(() => {
@@ -396,27 +417,8 @@ const Category = () => {
     ]
   );
 
-  // Loading state
-  if (
-    categoriesLoading ||
-    categoryProductsLoading ||
-    allProductsLoading ||
-    multipleCategoriesLoading
-  ) {
-    return (
-      <ClientLayout showHeader={true} showFooter={true}>
-        <main className="category-page">
-          <div style={{ textAlign: "center", padding: "50px" }}>
-            <h2>Loading category...</h2>
-            {categorySlug && <p>Loading products for {categorySlug}</p>}
-          </div>
-        </main>
-      </ClientLayout>
-    );
-  }
-
-  // Error state
-  if (!categories.length) {
+  // Error state for categories - only show after a reasonable delay
+  if (!categoriesLoading && !categories.length && categoriesData === null) {
     return (
       <ClientLayout showHeader={true} showFooter={true}>
         <main className="category-page">
@@ -537,17 +539,15 @@ const Category = () => {
               : "products-list category-products-list"
           }
         >
-          {categoryProductsLoading && categorySlug ? (
-            <div
-              style={{
-                gridColumn: "1 / -1",
-                textAlign: "center",
-                padding: "40px",
-                color: "var(--text-tertiary)",
-              }}
-            >
-              <p>Loading products for {categorySlug}...</p>
-            </div>
+          {/* Loading states for different scenarios */}
+          {categoriesLoading ? (
+            <SkeletonGrid count={3} type="product" layout={layout} />
+          ) : allProductsLoading && selectedCategories.length === 0 ? (
+            <SkeletonGrid count={3} type="product" layout={layout} />
+          ) : categoryProductsLoading && categorySlug ? (
+            <SkeletonGrid count={3} type="product" layout={layout} />
+          ) : multipleCategoriesLoading && selectedCategories.length > 1 ? (
+            <SkeletonGrid count={3} type="product" layout={layout} />
           ) : paginatedProducts.length === 0 ? (
             <div
               style={{

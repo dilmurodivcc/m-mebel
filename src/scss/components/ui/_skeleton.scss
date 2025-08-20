@@ -37,14 +37,23 @@
 
 // Product card skeleton
 .product-card-skeleton {
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   transition: transform 0.2s ease;
+  width: 100%;
+  height: fit-content;
+  min-width: 0; // Prevent flex items from overflowing
 
   &.grid {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
     .skeleton-image {
       width: 100%;
-      height: 200px;
+      height: 220px;
+      border-radius: 12px;
       background: linear-gradient(
         90deg,
         var(--skeleton-bg) 25%,
@@ -56,16 +65,18 @@
     }
 
     .skeleton-content {
-      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
 
       .skeleton-title {
-        height: 20px;
+        height: 18px;
         width: 80%;
-        margin-bottom: 12px;
+        margin-bottom: 8px;
       }
 
       .skeleton-price {
-        height: 18px;
+        height: 16px;
         width: 60%;
       }
     }
@@ -73,12 +84,12 @@
 
   &.list {
     display: flex;
-    gap: 16px;
-    padding: 16px;
+    gap: 20px;
+    padding: 20px;
 
     .skeleton-image {
-      width: 120px;
-      height: 120px;
+      width: 200px;
+      height: 200px;
       flex-shrink: 0;
       background: linear-gradient(
         90deg,
@@ -88,7 +99,7 @@
       );
       background-size: 200px 100%;
       animation: skeleton-shimmer 1.5s infinite;
-      border-radius: 8px;
+      border-radius: 12px;
     }
 
     .skeleton-content {
@@ -98,13 +109,15 @@
       gap: 8px;
 
       .skeleton-title {
-        height: 20px;
+        height: 22px;
         width: 70%;
+        margin-bottom: 8px;
       }
 
       .skeleton-description {
         height: 16px;
         width: 90%;
+        margin-bottom: 8px;
       }
 
       .skeleton-price {
@@ -160,6 +173,7 @@
   transition: transform 0.2s ease;
   text-align: center;
   max-width: 350px;
+
   cursor: pointer;
 
   .skeleton-image {
@@ -187,6 +201,10 @@
 
 // Product detail skeleton
 .product-detail-skeleton {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+
   .skeleton-actions {
     display: flex;
     justify-content: space-between;
@@ -194,13 +212,14 @@
     margin-bottom: 24px;
 
     .skeleton-back-btn {
-      height: 40px;
-      width: 120px;
+      height: 32px;
+      width: 100px;
+      border-radius: 8px;
     }
 
     .skeleton-right-actions {
       display: flex;
-      gap: 12px;
+      gap: 10px;
 
       .skeleton-btn {
         height: 40px;
@@ -211,8 +230,8 @@
   }
 
   .skeleton-breadcrumb {
-    height: 20px;
-    width: 60%;
+    height: 16px;
+    width: 70%;
     margin-bottom: 32px;
   }
 
@@ -220,6 +239,11 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 48px;
+    margin-top: 32px;
+
+    @media (max-width: 1024px) {
+      gap: 32px;
+    }
 
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
@@ -227,11 +251,14 @@
     }
 
     .skeleton-images {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
       .skeleton-main-image {
         width: 100%;
         height: 400px;
-        border-radius: 12px;
-        margin-bottom: 16px;
+        border-radius: 16px;
         background: linear-gradient(
           90deg,
           var(--skeleton-bg) 25%,
@@ -240,6 +267,8 @@
         );
         background-size: 200px 100%;
         animation: skeleton-shimmer 1.5s infinite;
+
+
       }
 
       .skeleton-thumbnails {
@@ -270,7 +299,7 @@
       }
 
       .skeleton-description {
-        height: 60px;
+        height: 80px;
         width: 100%;
       }
 
@@ -288,14 +317,14 @@
   }
 }
 
-// Skeleton grid
 .skeleton-grid {
   display: grid;
-  gap: 24px;
+  gap: 16px;
   width: 100%;
+  min-width: var(--container-width); // Prevent grid overflow
 
   &.grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
 
     @media (max-width: 768px) {
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -305,7 +334,7 @@
 
   &.list {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 20px;
   }
 }
 
@@ -335,13 +364,46 @@
 }
 
 .category-products-grid .skeleton-grid {
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 16px;
   }
+}
+
+// Ensure skeleton cards have proper width in category page
+.category-page .skeleton-grid.grid {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+}
+
+// Fix skeleton grid inside category products grid
+.category-products-grid .skeleton-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 16px !important;
+  width: 100% !important;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+    gap: 16px !important;
+  }
+}
+
+// Fix skeleton grid inside category products list
+.category-products-list .skeleton-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  width: 100%;
 }
 
 .category-products-list .skeleton-grid {

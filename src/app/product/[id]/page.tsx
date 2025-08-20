@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import LanguageChanger from "@/components/ui/LanguageChanger";
 import { useGetProduct } from "@/hooks/getProducts";
 import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
+import { ProductDetailSkeleton } from "@/components/ui/SkeletonLoader";
 
 export const dynamic = "force-dynamic";
 
@@ -108,9 +109,7 @@ const ProductDetail = () => {
     return (
       <ClientLayout showHeader={false} showFooter={false}>
         <main className="product-detail-page">
-          <div style={{ textAlign: "center", padding: "50px" }}>
-            <h2>Loading...</h2>
-          </div>
+          <ProductDetailSkeleton />
         </main>
       </ClientLayout>
     );

@@ -1,0 +1,66 @@
+.smooth-loading-container {
+  position: relative;
+  min-height: 200px;
+}
+
+.smooth-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 8px;
+}
+
+.smooth-loading-spinner {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+.smooth-loading-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--primary-color, #007bff);
+  animation: smooth-loading-bounce 1.4s ease-in-out infinite both;
+}
+
+.smooth-loading-dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.smooth-loading-dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+.smooth-loading-dot:nth-child(3) {
+  animation-delay: 0s;
+}
+
+@keyframes smooth-loading-bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+  .smooth-loading-overlay {
+    background: rgba(0, 0, 0, 0.8);
+  }
+}

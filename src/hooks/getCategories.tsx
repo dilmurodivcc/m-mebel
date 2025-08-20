@@ -105,7 +105,8 @@ export const useGetCategories = () => {
 
     const fetchCategories = async () => {
       const now = Date.now();
-      if (data && now - lastFetch < 5 * 60 * 1000) {
+      if (data && now - lastFetch < 2 * 60 * 1000) {
+        // Reduced cache time
         setLoading(false);
         return;
       }
@@ -121,7 +122,7 @@ export const useGetCategories = () => {
             API.get("/api/categories?populate[0]=image", {
               signal: controller.signal,
             }).then((r) => r),
-          5 * 60 * 1000
+          2 * 60 * 1000 // Reduced cache time for faster updates
         );
 
         if (!isMounted) return;
@@ -174,9 +175,13 @@ export const useGetCategory = (documentId: string) => {
       try {
         setLoading(true);
         setError(null);
-        const response = await API.get(
-          `/api/categories/${documentId}?populate[0]=image`,
-          { signal: controller.signal }
+        const response = await fetchWithCache(
+          `category-${documentId}`,
+          () =>
+            API.get(`/api/categories/${documentId}?populate[0]=image`, {
+              signal: controller.signal,
+            }).then((r) => r),
+          2 * 60 * 1000 // Cache for 2 minutes
         );
         setData(response.data);
       } catch (error: unknown) {
@@ -215,9 +220,14 @@ export const useGetCategoriesWithPagination = (
       try {
         setLoading(true);
         setError(null);
-        const response = await API.get(
-          `/api/categories?populate[0]=image&pagination[page]=${page}&pagination[pageSize]=${pageSize}`,
-          { signal: controller.signal }
+        const response = await fetchWithCache(
+          `categories-paginated-${page}-${pageSize}`,
+          () =>
+            API.get(
+              `/api/categories?populate[0]=image&pagination[page]=${page}&pagination[pageSize]=${pageSize}`,
+              { signal: controller.signal }
+            ).then((r) => r),
+          1 * 60 * 1000 // Cache for 1 minute
         );
         setData(response.data);
       } catch (error: unknown) {
@@ -318,7 +328,7 @@ export const useGetCategoryWithProducts = (slug: string) => {
         const response = await fetchWithCache(
           `category-with-products:${slug}`,
           () => API.get(url, { signal: controller.signal }).then((r) => r),
-          5 * 60 * 1000
+          2 * 60 * 1000 // Reduced cache time
         );
 
         if (!isMounted) return;

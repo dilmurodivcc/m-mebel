@@ -22,7 +22,7 @@ export function clearRequestCache(key?: string) {
 export async function fetchWithCache<T>(
   key: string,
   fetcher: () => Promise<T>,
-  ttlMs: number = 5 * 60 * 1000
+  ttlMs: number = 2 * 60 * 1000 // Reduced default cache time
 ): Promise<T> {
   const now = Date.now();
 
@@ -48,6 +48,13 @@ export async function fetchWithCache<T>(
 
   inflightStore.set(key, promise);
   return promise;
+}
+
+// Fast fetch without cache for immediate data
+export async function fetchImmediate<T>(
+  fetcher: () => Promise<T>
+): Promise<T> {
+  return await fetcher();
 }
 
 
