@@ -43,7 +43,7 @@ const Header = () => {
 
   const { data: categoriesData, loading: categoriesLoading } =
     useGetCategories();
-  const { data: productsData, loading: productsLoading } = useGetProducts();
+  const { data: productsData } = useGetProducts();
   const { siteName, favicon, loading: siteInfoLoading } = useGetSiteInfo();
 
   const categories = useMemo(

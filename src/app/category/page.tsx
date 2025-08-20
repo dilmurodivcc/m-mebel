@@ -214,8 +214,14 @@ const Category = () => {
     data: productsByMultipleCategoriesData,
     loading: multipleCategoriesLoading,
   } = useGetProductsByCategoryIds(selectedCategoryIds);
-  const productsByCategory = productsByCategoryData?.data || [];
-  const allProducts = allProductsData?.data || [];
+  const productsByCategory = useMemo(
+    () => productsByCategoryData?.data || [],
+    [productsByCategoryData?.data]
+  );
+  const allProducts = useMemo(
+    () => allProductsData?.data || [],
+    [allProductsData?.data]
+  );
 
   // Sync URL params with store state
   useEffect(() => {
