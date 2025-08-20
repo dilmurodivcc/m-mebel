@@ -30,7 +30,7 @@ const languages = [
  */
 const LanguageChanger = ({ className = "" }) => {
   const { i18n } = useTranslation();
-  const { language, setLanguage } = useThemeStore();
+  const { setLanguage } = useThemeStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 "use client";
 
 import ClientLayout from "@/components/layout/ClientLayout";
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { LuSunMedium, LuMoon } from "react-icons/lu";

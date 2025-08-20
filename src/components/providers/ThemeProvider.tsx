@@ -15,7 +15,7 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
     setMounted(true);
     // Set initial theme immediately
     document.documentElement.setAttribute("data-theme", theme);
-  }, []);
+  }, [theme]);
 
   useEffect(() => {
     if (mounted) {

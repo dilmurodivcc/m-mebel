@@ -1,10 +1,5 @@
 import axios from "axios";
 
-/**
- * Function to get current language from localStorage or default to 'ru'
- * This is used by the API interceptor to automatically add locale parameters
- * to all API requests based on the user's selected language.
- */
 const getCurrentLanguage = (): string => {
   if (typeof window !== "undefined") {
     const stored = localStorage.getItem("theme-storage");
@@ -20,11 +15,6 @@ const getCurrentLanguage = (): string => {
   return "ru";
 };
 
-/**
- * API instance with automatic locale parameter injection.
- * All requests will automatically include locale=uz or locale=ru parameter
- * based on the user's language selection stored in the theme store.
- */
 const API = axios.create({
   baseURL:
     process.env.NEXT_PUBLIC_API_URL ||
@@ -41,8 +31,7 @@ API.interceptors.request.use(
       config.timeout = 20000;
     }
 
-    // Add locale parameter to all requests
-    const currentLanguage = getCurrentLanguage();
+      const currentLanguage = getCurrentLanguage();
     if (config.params) {
       config.params.locale = currentLanguage;
     } else {
@@ -61,10 +50,6 @@ API.interceptors.response.use(
     return response;
   },
   (error) => {
-    const status = error.response?.status;
-    const data = error.response?.data;
-    const code = error.code;
-    const message = error.message;
     return Promise.reject(error);
   }
 );

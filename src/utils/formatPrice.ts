@@ -66,7 +66,7 @@ export const getCurrentLocale = (): string => {
 };
 
 // Helper function to add locale to API params
-export const addLocaleToParams = (params: Record<string, any> = {}): Record<string, any> => {
+export const addLocaleToParams = (params: Record<string, string | number | boolean> = {}): Record<string, string | number | boolean> => {
   return {
     ...params,
     locale: getCurrentLocale(),
@@ -78,8 +78,8 @@ export const addLocaleToParams = (params: Record<string, any> = {}): Record<stri
  * @param fields - Array of field names to populate
  * @returns Object with proper populate parameters
  */
-export const buildPopulateParams = (fields: string[]): Record<string, any> => {
-  const populateParams: Record<string, any> = {};
+export const buildPopulateParams = (fields: string[]): Record<string, string> => {
+  const populateParams: Record<string, string> = {};
   
   fields.forEach((field, index) => {
     populateParams[`populate[${index}]`] = field;
@@ -96,7 +96,7 @@ export const buildPopulateParams = (fields: string[]): Record<string, any> => {
  */
 export const buildStrapiQuery = (
   fields: string[] = [], 
-  additionalParams: Record<string, any> = {}
+  additionalParams: Record<string, string | number | boolean> = {}
 ): string => {
   const params = new URLSearchParams();
   

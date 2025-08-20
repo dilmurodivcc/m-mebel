@@ -1,25 +1,5 @@
 // default light mode
 :root {
-  --black: #000;
-  --white: #fff;
-  --bg: #fcfaf7;
-  --bg-primary: #fff;
-  --bg-secondary: #f2ede8;
-  --text: #1c140d;
-  --text-primary: #1c140d;
-  --text-secondary: #fff;
-  --text-tertiary: #96734f;
-  --bg-tertiary: #eb9642;
-  --border: #e5e8eb;
-  --border-color: #e5e8eb;
-  --skeleton-bg: #f2ede8;
-  --skeleton-highlight: #e5e8eb;
-  --card-bg: #fff;
-  --font-family: "Work Sans", sans-serif;
-  --font-secondary: "Playwrite AU QLD", cursive;
-}
-// dark mode
-[data-theme="dark"] {
   --black: #fff;
   --white: #000;
   --bg: #211912;
@@ -35,4 +15,24 @@
   --skeleton-bg: #473624;
   --skeleton-highlight: #5a4530;
   --card-bg: #2a1f15;
+  --font-family: "Work Sans", sans-serif;
+  --font-secondary: "Playwrite AU QLD", cursive;
+}
+// light mode
+[data-theme="light"] {
+  --black: #000;
+  --white: #fff;
+  --bg: #fcfaf7;
+  --bg-primary: #fff;
+  --bg-secondary: #f2ede8;
+  --text: #1c140d;
+  --text-primary: #1c140d;
+  --text-secondary: #fff;
+  --text-tertiary: #96734f;
+  --bg-tertiary: #eb9642;
+  --border: #e5e8eb;
+  --border-color: #e5e8eb;
+  --skeleton-bg: #f2ede8;
+  --skeleton-highlight: #e5e8eb;
+  --card-bg: #fff;
 }

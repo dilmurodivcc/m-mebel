@@ -17,7 +17,9 @@ export default function ClientLayout({
   return (
     <ThemeProvider>
       <SEOProvider>
-        {isNeedSpace && <div className="space" style={{ height: "100px" }}></div>}
+        {isNeedSpace && (
+          <div className="space" style={{ height: "100px" }}></div>
+        )}
         {showHeader && <Header />}
         {children}
         {showFooter && <Footer />}

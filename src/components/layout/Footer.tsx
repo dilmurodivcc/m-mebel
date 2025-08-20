@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useCategoryStore } from "@/app/category/store";
 import { useGetCategories } from "@/hooks/getCategories";
 import { FaPhone } from "react-icons/fa6";
-import { TfiEmail } from "react-icons/tfi";
 import {
   useGetSiteInfo,
   useGetSocialMediaLinks,
@@ -20,7 +19,6 @@ const Footer = () => {
     (state) => state.setSelectedCategory
   );
 
-  // API hooks
   const { data: categoriesData } = useGetCategories();
   const { siteName, favicon } = useGetSiteInfo();
   const { socialMedia } = useGetSocialMediaLinks();
