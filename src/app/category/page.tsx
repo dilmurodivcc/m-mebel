@@ -157,7 +157,6 @@ const Category = () => {
   const searchParams = useSearchParams();
 
   // Store state
-  const selectedCategory = useCategoryStore((s) => s.selectedCategory);
   const selectedCategories = useCategoryStore((s) => s.selectedCategories);
   const setSelectedCategories = useCategoryStore(
     (s) => s.setSelectedCategories
@@ -187,7 +186,10 @@ const Category = () => {
     useGetProducts();
 
   // Get data from API
-  const categories = categoriesData?.data || [];
+  const categories = useMemo(
+    () => categoriesData?.data || [],
+    [categoriesData?.data]
+  );
 
   // Get category IDs for selected categories
   const selectedCategoryIds = useMemo(() => {
@@ -273,7 +275,6 @@ const Category = () => {
     categorySlug,
     productsByCategory,
     selectedCategories,
-    selectedCategoryIds,
     productsByMultipleCategoriesData,
     allProducts,
   ]);
@@ -360,7 +361,6 @@ const Category = () => {
   // Optimized remove category handler
   const handleRemoveCategory = useCallback(
     (cat: string) => {
-
       const newCategories = selectedCategories.filter((c) => c !== cat);
       setSelectedCategories(newCategories);
 
@@ -626,4 +626,3 @@ const Category = () => {
 };
 
 export default Category;
-
