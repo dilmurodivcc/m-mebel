@@ -15,7 +15,7 @@ import { useGetProducts } from "@/hooks/getProducts";
 import { useGetSiteInfo } from "@/hooks/getGlobals";
 import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
 import { HiMenuAlt3 } from "react-icons/hi";
-import { MdClose, MdCategory, MdHome } from "react-icons/md";
+import { MdCategory, MdHome } from "react-icons/md";
 
 const Header = () => {
   const { t } = useTranslation();
@@ -304,8 +304,6 @@ const Header = () => {
       {isMenuOpen && (
         <div className="mobile-menu-overlay">
           <div className="mobile-menu-content">
-
-
             <ul className="mobile-menu-list">
               {/* Home Link */}
               <li className="mobile-menu-item">
