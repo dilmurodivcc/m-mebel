@@ -1,6 +1,7 @@
 import "../scss/main.scss";
 import { Suspense } from "react";
 import Loading from "./loading";
+import I18nProvider from "../components/providers/I18nProvider";
 
 export default function RootLayout({
   children,
@@ -26,9 +27,11 @@ export default function RootLayout({
         <meta property="og:image" content="" />
       </head>
       <body>
+        <I18nProvider>
           <Suspense fallback={<Loading />}>
             <div className="container">{children}</div>
           </Suspense>
+        </I18nProvider>
       </body>
     </html>
   );

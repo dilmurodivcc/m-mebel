@@ -14,6 +14,8 @@ import { useGetCategories } from "@/hooks/getCategories";
 import { useGetProducts } from "@/hooks/getProducts";
 import { useGetSiteInfo } from "@/hooks/getGlobals";
 import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
+import { HiMenuAlt3 } from "react-icons/hi";
+import { MdClose, MdCategory, MdHome } from "react-icons/md";
 
 const Header = () => {
   const { t } = useTranslation();
@@ -40,7 +42,7 @@ const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
   const isHomePage = pathname === "/";
-
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { data: categoriesData, loading: categoriesLoading } =
     useGetCategories();
   const { data: productsData } = useGetProducts();
@@ -56,6 +58,26 @@ const Header = () => {
     setIsClient(true);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (
+        isMenuOpen &&
+        target &&
+        !target.closest(".mobile-menu") &&
+        !target.closest(".mobile-menu-overlay")
+      ) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener("click", handleClickOutside);
+      return () => {
+        document.removeEventListener("click", handleClickOutside);
+      };
+    }
+  }, [isMenuOpen]);
   const filteredSearchResults = useMemo(() => {
     if (
       !searchQuery.trim() ||
@@ -233,8 +255,7 @@ const Header = () => {
         ) : (
           <ul className="menu-list">
             {categoriesLoading
-                ? 
-                Array.from({ length: maxCategoryLength }).map((_, index) => (
+              ? Array.from({ length: maxCategoryLength }).map((_, index) => (
                   <li key={`loading-category-${index}`}>
                     <div className="header-category-skeleton"></div>
                   </li>
@@ -262,6 +283,14 @@ const Header = () => {
           </ul>
         )}
         <ul className="btn-group">
+          <li className="mobile-menu">
+            <button
+              className="primary-btn"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              <HiMenuAlt3 />
+            </button>
+          </li>
           <li>
             <button className="primary-btn" onClick={toggleTheme}>
               {theme === "light" ? <LuSunMedium /> : <LuMoon />}
@@ -272,6 +301,68 @@ const Header = () => {
           </li>
         </ul>
       </nav>
+      {isMenuOpen && (
+        <div className="mobile-menu-overlay">
+          <div className="mobile-menu-content">
+
+
+            <ul className="mobile-menu-list">
+              {/* Home Link */}
+              <li className="mobile-menu-item">
+                <Link
+                  href="/"
+                  className={`mobile-menu-link ${
+                    pathname === "/" ? "active" : ""
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <MdHome className="mobile-menu-icon" />
+                  {t("breadcrumbMain")}
+                </Link>
+              </li>
+
+              {/* All Categories Link */}
+              <li className="mobile-menu-item">
+                <Link
+                  href="/category"
+                  className={`mobile-menu-link ${
+                    pathname === "/category" && !selectedCategory
+                      ? "active"
+                      : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedCategory("");
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  <MdCategory className="mobile-menu-icon" />
+                  {t("allCategories")}
+                </Link>
+              </li>
+
+              {/* Category Links */}
+              {categories.map((cat) => (
+                <li key={cat?.id || Math.random()} className="mobile-menu-item">
+                  <button
+                    className={`mobile-menu-link ${
+                      selectedCategory === cat?.name ? "active" : ""
+                    }`}
+                    onClick={() => {
+                      if (cat) {
+                        handleCategoryClick(cat);
+                        setIsMenuOpen(false);
+                      }
+                    }}
+                  >
+                    <MdCategory className="mobile-menu-icon" />
+                    {cat?.name || "Unknown Category"}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

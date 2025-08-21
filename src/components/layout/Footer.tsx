@@ -34,6 +34,7 @@ const Footer = () => {
   return (
     <footer className="footer">
       <div className="footer__main">
+        
         <div className="column">
           <Link href="/" className="footer__brand">
             <img

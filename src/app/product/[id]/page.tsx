@@ -12,6 +12,7 @@ import LanguageChanger from "@/components/ui/LanguageChanger";
 import { useGetProduct } from "@/hooks/getProducts";
 import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
 import { ProductDetailSkeleton } from "@/components/ui/SkeletonLoader";
+import ErrorState from "@/components/ui/ErrorState";
 
 export const dynamic = "force-dynamic";
 
@@ -113,12 +114,24 @@ const ProductDetail = () => {
     return (
       <ClientLayout showHeader={false} showFooter={false}>
         <main className="product-detail-page">
-          <div className="product-not-found">
-            <h1>{t("productNotFound")}</h1>
-            <button onClick={() => router.push("/category")}>
-              {t("backToCategory")}
-            </button>
-          </div>
+          <ErrorState
+            title={!product ? t("productNotFound") : undefined}
+            description={
+              !product
+                ? t("productNotFoundDescription") ||
+                  "The product you're looking for doesn't exist or has been removed."
+                : undefined
+            }
+            error={error || undefined}
+            onRetry={() => router.push("/category")}
+            iconType={
+              error?.includes("timeout")
+                ? "timeout"
+                : error?.includes("network")
+                ? "network"
+                : "error"
+            }
+          />
         </main>
       </ClientLayout>
     );
@@ -238,19 +251,19 @@ const ProductDetail = () => {
                     <div className="spec-item">
                       <span className="spec-label">{t("height")}</span>
                       <span className="spec-value">
-                        {product.SizesOfProduct.height} 
+                        {product.SizesOfProduct.height}
                       </span>
                     </div>
                     <div className="spec-item">
                       <span className="spec-label">{t("width")}</span>
                       <span className="spec-value">
-                        {product.SizesOfProduct.width} 
+                        {product.SizesOfProduct.width}
                       </span>
                     </div>
                     <div className="spec-item">
                       <span className="spec-label">{t("depth")}</span>
                       <span className="spec-value">
-                        {product.SizesOfProduct.depth} 
+                        {product.SizesOfProduct.depth}
                       </span>
                     </div>
                   </>

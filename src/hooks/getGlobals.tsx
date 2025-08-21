@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import API from "../API";
 import { fetchWithCache } from "@/utils/requestCache";
 
-  export interface GlobalImage {
+export interface GlobalImage {
   id: number;
   documentId: string;
   name: string;
@@ -81,7 +81,7 @@ export interface Global {
   updatedAt: string;
   publishedAt: string;
   favicon: GlobalImage;
-  heroImage?: GlobalImage;
+  heroImage?: GlobalImage | GlobalImage[];
   seoImg?: GlobalImage;
   defaultSeo: DefaultSeo;
   Social_Media_Links: SocialMediaLinks;
@@ -111,9 +111,12 @@ export const useGetGlobals = () => {
         const response = await fetchWithCache(
           "globals?populate=deep",
           () =>
-            API.get("/api/global?populate[0]=favicon&populate[1]=heroImage&populate[2]=defaultSeo&populate[3]=Social_Media_Links&populate[4]=Phone_Numbers&populate[5]=seoImg", {
-              signal: controller.signal,
-            }).then((r) => r),
+            API.get(
+              "/api/global?populate[0]=favicon&populate[1]=heroImage&populate[2]=defaultSeo&populate[3]=Social_Media_Links&populate[4]=Phone_Numbers&populate[5]=seoImg",
+              {
+                signal: controller.signal,
+              }
+            ).then((r) => r),
           5 * 60 * 1000
         );
 
@@ -174,7 +177,7 @@ export const useGetSocialMediaLinks = () => {
     error,
   };
 };
-  
+
 export const useGetPhoneNumbers = () => {
   const { data, loading, error } = useGetGlobals();
 

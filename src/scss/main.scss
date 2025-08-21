@@ -5,6 +5,9 @@
 @import "components/ui/buttons";
 @import "components/ui/language-changer";
 @import "components/ui/skeleton";
+@import "components/ui/error-state";
+@import "components/ui/empty-state";
+@import "components/ui/hero-carousel";
 @import "components/layout/header";
 @import "components/layout/footer";
 
@@ -25,14 +28,14 @@
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  animation: fadeIn 0.2s ease-in-out; 
+  animation: fadeIn 0.2s ease-in-out;
 
   p {
     margin-top: 16px;
     font-size: 16px;
     color: #333;
     font-weight: 500;
-    animation: slideUp 0.3s ease-out; 
+    animation: slideUp 0.3s ease-out;
   }
 }
 

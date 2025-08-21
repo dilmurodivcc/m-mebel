@@ -49,6 +49,8 @@ i18n
     },
     load: 'languageOnly',
     preload: ['ru', 'uz'],
+    // Prevent hydration issues
+    initImmediate: false,
   });
 
 export default i18n; 

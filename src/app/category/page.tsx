@@ -26,6 +26,8 @@ import { useGetCategories } from "@/hooks/getCategories";
 import { useSearchParams, useRouter } from "next/navigation";
 import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
 import { SkeletonGrid } from "@/components/ui/SkeletonLoader";
+import ErrorState from "@/components/ui/ErrorState";
+import EmptyState from "@/components/ui/EmptyState";
 
 export const dynamic = "force-dynamic";
 
@@ -399,10 +401,12 @@ const Category = () => {
     return (
       <ClientLayout showHeader={true} showFooter={true}>
         <main className="category-page">
-          <div style={{ textAlign: "center", padding: "50px" }}>
-            <h2>No categories found</h2>
-            <button onClick={() => window.location.reload()}>Retry</button>
-          </div>
+          <ErrorState
+            title={t("noCategories")}
+            description={t("noCategoriesDescription")}
+            onRetry={() => window.location.reload()}
+            iconType="error"
+          />
         </main>
       </ClientLayout>
     );
@@ -519,7 +523,7 @@ const Category = () => {
               : "products-list category-products-list"
           }
         >
-            {categoriesLoading ? (
+          {categoriesLoading ? (
             <SkeletonGrid count={3} type="product" layout={layout} />
           ) : allProductsLoading && selectedCategories.length === 0 ? (
             <SkeletonGrid count={3} type="product" layout={layout} />
@@ -531,29 +535,17 @@ const Category = () => {
             <div
               style={{
                 gridColumn: "1 / -1",
-                textAlign: "center",
-                padding: "40px",
-                color: "var(--text-tertiary)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "400px",
               }}
             >
-              <p>No products found in this category.</p>
-              <p>
-                Debug info: Category slug: {categorySlug}, Products count:{" "}
-                {products.length}
-              </p>
-              <p>Selected categories: {selectedCategories.join(", ")}</p>
-              <p>Selected category IDs: {selectedCategoryIds.join(", ")}</p>
-              <p>
-                Category with products:{" "}
-                {productsByCategory.length > 0 ? "Yes" : "No"}
-              </p>
-              <p>
-                Multiple categories with products:{" "}
-                {(productsByMultipleCategoriesData?.data?.length || 0) > 0
-                  ? "Yes"
-                  : "No"}
-              </p>
-              <p>All products count: {allProducts.length}</p>
+              <EmptyState
+                title={t("noProducts")}
+                description={t("noProductsDescription")}
+                iconType="products"
+              />
             </div>
           ) : (
             paginatedProducts.map((product) => (

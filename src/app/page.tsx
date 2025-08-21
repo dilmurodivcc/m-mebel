@@ -1,6 +1,5 @@
 "use client";
 
-import "../i18n";
 import { useTranslation } from "react-i18next";
 import ClientLayout from "../components/layout/ClientLayout";
 import { useEffect, useState } from "react";
@@ -11,6 +10,8 @@ import { useGetCategories } from "@/hooks/getCategories";
 import { useGetSiteInfo } from "@/hooks/getGlobals";
 import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
 import { SkeletonGrid } from "@/components/ui/SkeletonLoader";
+import ErrorState from "@/components/ui/ErrorState";
+import HeroCarousel from "@/components/ui/HeroCarousel";
 
 declare global {
   interface Window {
@@ -52,6 +53,40 @@ export default function Home() {
   const featuredProducts = products.slice(0, 4);
 
   const categories = categoriesData?.data || [];
+
+  const getHeroCarouselImages = () => {
+    const carouselImages = [];
+
+    // Use all hero images from API if available
+    if (heroImage && Array.isArray(heroImage) && heroImage.length > 0) {
+      heroImage.forEach((image) => {
+        if (image && image.url) {
+          carouselImages.push({
+            url: image.url,
+            name: image.name || "Hero Image",
+          });
+        }
+      });
+    } else if (heroImage && !Array.isArray(heroImage) && heroImage.url) {
+      // Fallback for single hero image
+      carouselImages.push({
+        url: heroImage.url,
+        name: heroImage.name || "Hero Image",
+      });
+    }
+
+    // If we still don't have enough images, add fallback images
+    while (carouselImages.length < 4) {
+      carouselImages.push({
+        url: "/img/cardimg.png",
+        name: "Featured Furniture",
+      });
+    }
+
+    return carouselImages.slice(0, 4); // Ensure exactly 4 images
+  };
+
+  const heroCarouselImages = getHeroCarouselImages();
 
   useEffect(() => {
     router.prefetch("/category");
@@ -128,25 +163,41 @@ export default function Home() {
   }
 
   if (productsError || categoriesError || siteInfoError) {
+    // Determine the type of error for better UX
+    const getErrorType = () => {
+      if (
+        productsError?.includes("timeout") ||
+        categoriesError?.includes("timeout") ||
+        siteInfoError?.includes("timeout")
+      ) {
+        return "timeout";
+      }
+      if (
+        productsError?.includes("network") ||
+        categoriesError?.includes("network") ||
+        siteInfoError?.includes("network")
+      ) {
+        return "network";
+      }
+      return "error";
+    };
+
+    const errorMessages = [
+      productsError && `Products: ${productsError}`,
+      categoriesError && `Categories: ${categoriesError}`,
+      siteInfoError && `Site info: ${siteInfoError}`,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
     return (
       <ClientLayout showHeader={true} showFooter={true}>
         <main className="home-page">
-          <div className="empty-state">
-            <div className="empty-icon">⚠️</div>
-            <h2 className="empty-title">Error loading data</h2>
-            <p className="empty-description">
-              {productsError && `Products error: ${productsError}`}
-              {categoriesError && `Categories error: ${categoriesError}`}
-              {siteInfoError && `Site info error: ${siteInfoError}`}
-            </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="primary-btn"
-              style={{ marginTop: "16px" }}
-            >
-              Retry
-            </button>
-          </div>
+          <ErrorState
+            iconType={getErrorType()}
+            error={errorMessages}
+            onRetry={() => window.location.reload()}
+          />
         </main>
       </ClientLayout>
     );
@@ -156,39 +207,22 @@ export default function Home() {
     <ClientLayout showHeader={true} showFooter={true}>
       <main className="home-page">
         <section className="hero-section">
-          {heroImage ? (
-            <>
-              <div className="hero-background">
-                <img
-                  src={getImageUrl(heroImage.url)}
-                  alt={heroImage.name || "Hero Image"}
-                  className="hero-image"
-                />
-                <div className="hero-overlay"></div>
-              </div>
-              <div className="hero-content">
-                <div className="container">
-                  <h1 suppressHydrationWarning>
-                    {isClient ? t("heroTitle") : "Loading..."}
-                  </h1>
-                  <p suppressHydrationWarning>
-                    {isClient ? t("heroSubtitle") : "Loading..."}
-                  </p>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="hero-content fallback">
-              <div className="container">
-                <h1 suppressHydrationWarning>
-                  {isClient ? t("heroTitle") : "Loading..."}
-                </h1>
-                <p suppressHydrationWarning>
-                  {isClient ? t("heroSubtitle") : "Loading..."}
-                </p>
-              </div>
+          <HeroCarousel
+            images={heroCarouselImages}
+            autoPlayInterval={3000}
+            showIndicators={true}
+            showArrows={true}
+          />
+          <div className="hero-content">
+            <div className="container">
+              <h1 suppressHydrationWarning>
+                {isClient ? t("heroTitle") : "Loading..."}
+              </h1>
+              <p suppressHydrationWarning>
+                {isClient ? t("heroSubtitle") : "Loading..."}
+              </p>
             </div>
-          )}
+          </div>
         </section>
 
         <section className="featured-collections">
