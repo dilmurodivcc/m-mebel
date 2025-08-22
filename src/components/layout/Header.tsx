@@ -180,7 +180,7 @@ const Header = () => {
     <header className="header">
       <Link href="/" className="logo">
         <img
-          src={favicon?.url ? getImageUrl(favicon.url) : "/icons/logo.png"}
+          src={favicon?.url ? getImageUrl(favicon.url) : "/icons/favicon.png"}
           alt={isClient ? siteName || "logo" : "logo"}
           width={120}
           style={{

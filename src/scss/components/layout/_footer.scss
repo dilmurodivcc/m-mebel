@@ -10,7 +10,7 @@ footer {
     display: flex;
     width: 100%;
     justify-content: space-between;
-    align-items: start;
+    align-items: flex-start;
     gap: 40px;
   }
 
@@ -20,24 +20,22 @@ footer {
     gap: 0.8rem;
     width: 100%;
     margin-top: 1rem;
-    margin-bottom: 1rem;
-
 
     a {
       color: var(--text-secondary);
       font-size: 1.3rem;
       background-color: var(--bg-secondary);
-      padding: 8px 12px;
+      padding: 6px 10px;
       display: grid;
       place-items: center;
-      border-radius: 8px;
+      border-radius: 10px;
       color: var(--text-tertiary);
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
 
       &:hover {
         color: var(--primary-color);
-        background-color: var(--bg-tertiary);
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
     }
   }
@@ -136,8 +134,8 @@ footer {
       gap: 0.8rem;
       width: 100%;
       background-color: var(--bg-secondary);
-      padding: 8px 12px;
-      border-radius: 8px;
+      padding: 6px 10px;
+      border-radius: 10px;
       font-size: 14px;
       color: var(--text-tertiary);
       text-decoration: none;
@@ -145,10 +143,66 @@ footer {
 
       &:hover {
         color: var(--primary-color);
-        background-color: var(--bg-tertiary);
-        transform: translateY(-1px);
       }
     }
+  }
+}
+
+// Footer Skeleton Styles
+.footer-social-skeleton {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-bg) 25%,
+    var(--skeleton-highlight) 50%,
+    var(--skeleton-bg) 75%
+  );
+  background-size: 200px 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  flex-shrink: 0;
+}
+
+.footer-contact-skeleton {
+  width: 140px;
+  height: 16px;
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-bg) 25%,
+    var(--skeleton-highlight) 50%,
+    var(--skeleton-bg) 75%
+  );
+  background-size: 200px 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.footer-link-skeleton {
+  width: 120px;
+  height: 14px;
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-bg) 25%,
+    var(--skeleton-highlight) 50%,
+    var(--skeleton-bg) 75%
+  );
+  background-size: 200px 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
   }
 }
 
@@ -174,7 +228,7 @@ footer {
 @media (max-width: 768px) {
   footer {
     padding: 20px 0;
-    .footer__brand{
+    .footer__brand {
       display: none !important;
     }
 
@@ -250,7 +304,6 @@ footer {
         transition: all 0.2s ease;
 
         &:hover {
-          background: var(--bg-tertiary);
           transform: translateX(2px);
         }
       }
@@ -282,11 +335,74 @@ footer {
         border: 1px solid var(--border-color);
 
         &:hover {
-          background: var(--bg-tertiary);
           transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
       }
+    }
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 801px) {
+  footer {
+    .footer__main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 30px;
+      grid-template-areas:
+        "map map"
+        "column links";
+    }
+
+    .footer__map {
+      grid-area: map;
+      width: 100%;
+      max-width: 100%;
+      min-height: 250px;
+
+      iframe {
+        height: 250px;
+      }
+    }
+
+    .column {
+      grid-area: column;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .footer__links {
+      grid-area: links;
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+}
+
+@media (max-width: 800px) {
+  footer {
+    .footer__main {
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .footer__map {
+      order: -1;
+      width: 100%;
+      max-width: 100%;
+      min-height: 200px;
+
+      iframe {
+        height: 200px;
+        border-radius: 12px;
+      }
+    }
+
+    .column,
+    .footer__links {
+      width: 100%;
+      max-width: 100%;
     }
   }
 }

@@ -2,7 +2,7 @@
 
 import { useTranslation } from "react-i18next";
 import ClientLayout from "../components/layout/ClientLayout";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useGetProducts } from "@/hooks/getProducts";
@@ -24,8 +24,6 @@ export const dynamic = "force-dynamic";
 export default function Home() {
   const { t } = useTranslation();
   const router = useRouter();
-  const [isClient, setIsClient] = useState(false);
-
   const {
     data: productsData,
     loading: productsLoading,
@@ -41,10 +39,6 @@ export default function Home() {
     loading: siteInfoLoading,
     error: siteInfoError,
   } = useGetSiteInfo();
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const products = productsData?.data || [];
 
@@ -108,60 +102,7 @@ export default function Home() {
     }, 0);
   };
 
-  if (productsLoading || categoriesLoading || siteInfoLoading) {
-    return (
-      <ClientLayout showHeader={true} showFooter={true}>
-        <main className="home-page">
-          <section className="hero-section">
-            <div className="hero-content fallback">
-              <div className="container">
-                <h1 suppressHydrationWarning>
-                  {isClient ? t("heroTitle") : "Loading..."}
-                </h1>
-                <p suppressHydrationWarning>
-                  {isClient ? t("heroSubtitle") : "Loading..."}
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <section className="featured-collections">
-            <div className="container">
-              <h2 suppressHydrationWarning>
-                {isClient ? t("featuredCollections") : "Loading..."}
-              </h2>
-              <div className="collections-grid">
-                <SkeletonGrid count={4} type="collection" />
-              </div>
-            </div>
-          </section>
-
-          <section className="shop-category">
-            <div className="container">
-              <h2 suppressHydrationWarning>
-                {isClient ? t("shopByCategory") : "Loading..."}
-              </h2>
-              <div className="category-grid">
-                <SkeletonGrid count={6} type="category" />
-              </div>
-            </div>
-          </section>
-
-          <section className="new-arrivals">
-            <div className="container">
-              <h2 suppressHydrationWarning>
-                {isClient ? t("newArrivals") : "Loading..."}
-              </h2>
-              <div className="collections-grid">
-                <SkeletonGrid count={4} type="collection" />
-              </div>
-            </div>
-          </section>
-        </main>
-      </ClientLayout>
-    );
-  }
-
+  // Show error state if there are critical errors
   if (productsError || categoriesError || siteInfoError) {
     // Determine the type of error for better UX
     const getErrorType = () => {
@@ -212,24 +153,19 @@ export default function Home() {
             autoPlayInterval={3000}
             showIndicators={true}
             showArrows={true}
+            loading={siteInfoLoading}
           />
           <div className="hero-content">
             <div className="container">
-              <h1 suppressHydrationWarning>
-                {isClient ? t("heroTitle") : "Loading..."}
-              </h1>
-              <p suppressHydrationWarning>
-                {isClient ? t("heroSubtitle") : "Loading..."}
-              </p>
+              <h1 suppressHydrationWarning>{t("heroTitle")}</h1>
+              <p suppressHydrationWarning>{t("heroSubtitle")}</p>
             </div>
           </div>
         </section>
 
         <section className="featured-collections">
           <div className="container">
-            <h2 suppressHydrationWarning>
-              {isClient ? t("featuredCollections") : "Loading..."}
-            </h2>
+            <h2 suppressHydrationWarning>{t("featuredCollections")}</h2>
             <div className="collections-grid">
               {productsLoading ? (
                 <SkeletonGrid count={4} type="collection" />
@@ -252,13 +188,11 @@ export default function Home() {
                       />
                     </div>
                     <div className="card-content">
-                      <h3 suppressHydrationWarning>
-                        {isClient ? product.title : "Loading..."}
-                      </h3>
+                      <h3 suppressHydrationWarning>{product.title}</h3>
                       <p className="product-price">
-                        {isClient && product.price
+                        {product.price
                           ? formatPriceNumber(product.price)
-                          : "Loading..."}
+                          : "N/A"}
                       </p>
                     </div>
                   </Link>
@@ -270,9 +204,7 @@ export default function Home() {
 
         <section className="shop-category">
           <div className="container">
-            <h2 suppressHydrationWarning>
-              {isClient ? t("shopByCategory") : "Loading..."}
-            </h2>
+            <h2 suppressHydrationWarning>{t("shopByCategory")}</h2>
             <div className="category-grid">
               {categoriesLoading ? (
                 <SkeletonGrid count={6} type="category" />
@@ -293,9 +225,7 @@ export default function Home() {
                         }}
                       />
                     </div>
-                    <h3 suppressHydrationWarning>
-                      {isClient ? category.name : "Loading..."}
-                    </h3>
+                    <h3 suppressHydrationWarning>{category.name}</h3>
                   </Link>
                 ))
               )}
@@ -305,9 +235,7 @@ export default function Home() {
 
         <section className="new-arrivals">
           <div className="container">
-            <h2 suppressHydrationWarning>
-              {isClient ? t("newArrivals") : "Loading..."}
-            </h2>
+            <h2 suppressHydrationWarning>{t("newArrivals")}</h2>
             <div className="collections-grid">
               {productsLoading ? (
                 <SkeletonGrid count={4} type="collection" />
@@ -330,13 +258,11 @@ export default function Home() {
                       />
                     </div>
                     <div className="card-content">
-                      <h3 suppressHydrationWarning>
-                        {isClient ? product.title : "Loading..."}
-                      </h3>
+                      <h3 suppressHydrationWarning>{product.title}</h3>
                       <p className="product-price">
-                        {isClient && product.price
+                        {product.price
                           ? formatPriceNumber(product.price)
-                          : "Loading..."}
+                          : "N/A"}
                       </p>
                     </div>
                   </Link>

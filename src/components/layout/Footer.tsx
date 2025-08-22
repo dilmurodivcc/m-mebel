@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { FaInstagram, FaTelegramPlane } from "react-icons/fa";
-import { FaYoutube } from "react-icons/fa";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { useCategoryStore } from "@/app/category/store";
@@ -15,7 +13,6 @@ import { getImageUrl } from "@/utils/formatPrice";
 
 const Footer = () => {
   const { t } = useTranslation();
-  const [isClient, setIsClient] = useState(false);
   const setSelectedCategory = useCategoryStore(
     (state) => state.setSelectedCategory
   );
@@ -27,58 +24,63 @@ const Footer = () => {
 
   const categories = categoriesData?.data || [];
 
-    useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   return (
     <footer className="footer">
       <div className="footer__main">
-        
         <div className="column">
           <Link href="/" className="footer__brand">
             <img
-              src={favicon?.url ? getImageUrl(favicon.url) : "/icons/logo.png"}
+              src={
+                favicon?.url ? getImageUrl(favicon.url) : "/icons/favicon.png"
+              }
               alt={siteName || "logo"}
               width={60}
             />
-            <span suppressHydrationWarning>
-              {isClient ? siteName || t("logo") : t("logo")}
-            </span>
+            <span suppressHydrationWarning>{siteName || t("logo")}</span>
           </Link>
           <div className="footer__social">
-            {isClient && socialMedia?.Instagram && (
+            {socialMedia?.Instagram && (
               <a
                 href={socialMedia.Instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
               >
-                <FaInstagram />
+                <img
+                  src="/icons/instagram.webp"
+                  width={20}
+                  height={20}
+                  alt="instagram"
+                />
               </a>
             )}
-            {isClient && socialMedia?.Telegram && (
+            {socialMedia?.Telegram && (
               <a
                 href={`https://${socialMedia.Telegram}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Telegram"
               >
-                <FaTelegramPlane />
+                <img
+                  src="/icons/telegram.webp"
+                  width={20}
+                  height={20}
+                  alt="telegram"
+                />
               </a>
             )}
-            {isClient && socialMedia?.YouTobe && (
+            {socialMedia?.YouTobe && (
               <a
                 href={socialMedia.YouTobe}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="YouTube"
               >
-                <FaYoutube />
+                <img src="/icons/youtube.png" height={20} alt="youtube" />
               </a>
             )}
           </div>
-          {isClient && phoneNumbers && (
+          {phoneNumbers && (
             <div className="footer__contact">
               <a href={`tel:${phoneNumbers.tel1}`}>
                 <FaPhone color="green" /> +{phoneNumbers.tel1}
@@ -114,19 +116,18 @@ const Footer = () => {
         </div>
         <ul className="footer__links">
           <li className="title">{t("shopByCategory")}</li>
-          {isClient &&
-            categories.map((cat) => (
-              <li key={cat.id}>
-                <Link
-                  href={`/category?category=${cat.slug}`}
-                  onClick={() => {
-                    setSelectedCategory(cat.name);
-                  }}
-                >
-                  {cat.name}
-                </Link>
-              </li>
-            ))}
+          {categories.map((cat) => (
+            <li key={cat.id}>
+              <Link
+                href={`/category?category=${cat.slug}`}
+                onClick={() => {
+                  setSelectedCategory(cat.name);
+                }}
+              >
+                {cat.name}
+              </Link>
+            </li>
+          ))}
         </ul>
         <div className="footer__map">
           <iframe

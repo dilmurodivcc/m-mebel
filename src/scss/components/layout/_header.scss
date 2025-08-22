@@ -68,8 +68,8 @@
 }
 .dropdown-overlay {
   position: absolute;
-  right: 0;
   top: 48px;
+  right: -10px  !important;
   z-index: 1001;
 }
 .dropdown-content {

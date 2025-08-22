@@ -11,6 +11,7 @@ interface HeroCarouselProps {
   autoPlayInterval?: number;
   showIndicators?: boolean;
   showArrows?: boolean;
+  loading?: boolean;
 }
 
 const HeroCarousel: React.FC<HeroCarouselProps> = ({
@@ -18,6 +19,7 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({
   autoPlayInterval = 5000,
   showIndicators = true,
   showArrows = true,
+  loading = false,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -70,6 +72,18 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [goToPrevious, goToNext]);
+
+  // Show skeleton when loading
+  if (loading) {
+    return (
+      <div className="hero-carousel">
+        <div className="hero-carousel-skeleton">
+          <div className="hero-carousel-skeleton-image"></div>
+        </div>
+        <div className="hero-overlay"></div>
+      </div>
+    );
+  }
 
   if (!images || images.length === 0) {
     return null;

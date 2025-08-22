@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import "../../i18n";
 
 interface I18nProviderProps {
@@ -8,30 +7,7 @@ interface I18nProviderProps {
 }
 
 const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Prevent hydration mismatch by showing a loading state
-  if (!isClient) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "var(--bg)",
-          color: "var(--text)",
-        }}
-      >
-        <div>Loading...</div>
-      </div>
-    );
-  }
-
+  // Return children immediately without full-screen loading
   return <>{children}</>;
 };
 

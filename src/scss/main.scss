@@ -1,19 +1,19 @@
-@import "base/variables";
-@import "base/resets";
-@import "base/base";
+@use "base/variables";
+@use "base/resets";
+@use "base/base";
 
-@import "components/ui/buttons";
-@import "components/ui/language-changer";
-@import "components/ui/skeleton";
-@import "components/ui/error-state";
-@import "components/ui/empty-state";
-@import "components/ui/hero-carousel";
-@import "components/layout/header";
-@import "components/layout/footer";
+@use "components/ui/buttons";
+@use "components/ui/language-changer";
+@use "components/ui/skeleton";
+@use "components/ui/error-state";
+@use "components/ui/empty-state";
+@use "components/ui/hero-carousel";
+@use "components/layout/header";
+@use "components/layout/footer";
 
-@import "pages/home";
-@import "pages/category";
-@import "pages/product-detail";
+@use "pages/home";
+@use "pages/category";
+@use "pages/product-detail";
 
 .navigation-loading {
   position: fixed;

@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 import LanguageChanger from "@/components/ui/LanguageChanger";
 import { useGetProduct } from "@/hooks/getProducts";
 import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
-import { ProductDetailSkeleton } from "@/components/ui/SkeletonLoader";
+
 import ErrorState from "@/components/ui/ErrorState";
 
 export const dynamic = "force-dynamic";
@@ -100,17 +100,8 @@ const ProductDetail = () => {
     setShowContactInfo(!showContactInfo);
   }, [showContactInfo]);
 
-  if (loading) {
-    return (
-      <ClientLayout showHeader={false} showFooter={false}>
-        <main className="product-detail-page">
-          <ProductDetailSkeleton />
-        </main>
-      </ClientLayout>
-    );
-  }
-
-  if (error || !product) {
+  // Show error state if there are critical errors
+  if (error || (!loading && !product)) {
     return (
       <ClientLayout showHeader={false} showFooter={false}>
         <main className="product-detail-page">
@@ -188,109 +179,136 @@ const ProductDetail = () => {
         <div className="product-detail-content">
           <div className="product-images">
             <div className="main-image">
-              <img
-                src={
-                  (productImages.length > 0 && productImages[selectedImage]) ||
-                  (productImages.length > 0 && productImages[0]) ||
-                  "/img/cardimg.png"
-                }
-                alt={product?.title || t("product")}
-                className="product-main-img"
-                onError={(e) => {
-                  e.currentTarget.src = "/img/cardimg.png";
-                }}
-                loading="eager"
-              />
+              {loading ? (
+                <div className="product-main-img-skeleton" />
+              ) : (
+                <img
+                  src={
+                    (productImages.length > 0 &&
+                      productImages[selectedImage]) ||
+                    (productImages.length > 0 && productImages[0]) ||
+                    "/img/cardimg.png"
+                  }
+                  alt={product?.title || t("product")}
+                  className="product-main-img"
+                  onError={(e) => {
+                    e.currentTarget.src = "/img/cardimg.png";
+                  }}
+                  loading="eager"
+                />
+              )}
             </div>
             <div className="image-thumbnails">
-              {productImages.length > 0 &&
-                productImages.map((img, idx) => (
-                  <img
-                    key={idx}
-                    src={img}
-                    alt={`${product?.title || t("product")} ${idx + 1}`}
-                    className={`thumbnail${
-                      selectedImage === idx ? " active" : ""
-                    }`}
-                    onClick={() => setSelectedImage(idx)}
-                    onError={(e) => {
-                      e.currentTarget.src = "/img/cardimg.png";
-                    }}
-                    loading="lazy"
-                  />
-                ))}
+              {loading
+                ? Array.from({ length: 4 }).map((_, idx) => (
+                    <div key={idx} className="thumbnail-skeleton" />
+                  ))
+                : productImages.length > 0 &&
+                  productImages.map((img, idx) => (
+                    <img
+                      key={idx}
+                      src={img}
+                      alt={`${product?.title || t("product")} ${idx + 1}`}
+                      className={`thumbnail${
+                        selectedImage === idx ? " active" : ""
+                      }`}
+                      onClick={() => setSelectedImage(idx)}
+                      onError={(e) => {
+                        e.currentTarget.src = "/img/cardimg.png";
+                      }}
+                      loading="lazy"
+                    />
+                  ))}
             </div>
           </div>
 
           <div className="product-info">
             <h1 className="product-title" suppressHydrationWarning>
-              {isClient
-                ? productNameKey || product?.title || t("loading")
-                : t("loading")}
+              {loading ? (
+                <div className="product-title-skeleton" />
+              ) : isClient ? (
+                productNameKey || product?.title || t("loading")
+              ) : (
+                t("loading")
+              )}
             </h1>
             <div className="product-price">
-              {product?.price ? formatPriceNumber(product.price) : t("loading")}
+              {loading ? (
+                <div className="product-price-skeleton" />
+              ) : product?.price ? (
+                formatPriceNumber(product.price)
+              ) : (
+                t("loading")
+              )}
             </div>
 
             <div className="product-description">
               <h3>{t("description")}</h3>
-              <p suppressHydrationWarning>
-                {isClient
-                  ? productDescriptionKey ||
-                    product?.description ||
-                    t("loading")
-                  : t("loading")}
-              </p>
+              {loading ? (
+                <div className="product-description-skeleton" />
+              ) : (
+                <p suppressHydrationWarning>
+                  {isClient
+                    ? productDescriptionKey ||
+                      product?.description ||
+                      t("loading")
+                    : t("loading")}
+                </p>
+              )}
             </div>
 
             <div className="product-specs">
               <h3>{t("specifications")}</h3>
-              <div className="specs-grid">
-                {product?.SizesOfProduct && (
-                  <>
-                    <div className="spec-item">
-                      <span className="spec-label">{t("height")}</span>
-                      <span className="spec-value">
-                        {product.SizesOfProduct.height}
-                      </span>
-                    </div>
-                    <div className="spec-item">
-                      <span className="spec-label">{t("width")}</span>
-                      <span className="spec-value">
-                        {product.SizesOfProduct.width}
-                      </span>
-                    </div>
-                    <div className="spec-item">
-                      <span className="spec-label">{t("depth")}</span>
-                      <span className="spec-value">
-                        {product.SizesOfProduct.depth}
-                      </span>
-                    </div>
-                  </>
-                )}
-                <div className="spec-item">
-                  <span className="spec-label">{t("materials")}</span>
-                  <span className="spec-value">
-                    {product?.material || "N/A"}
-                  </span>
+              {loading ? (
+                <div className="product-specs-skeleton" />
+              ) : (
+                <div className="specs-grid">
+                  {product?.SizesOfProduct && (
+                    <>
+                      <div className="spec-item">
+                        <span className="spec-label">{t("height")}</span>
+                        <span className="spec-value">
+                          {product.SizesOfProduct.height}
+                        </span>
+                      </div>
+                      <div className="spec-item">
+                        <span className="spec-label">{t("width")}</span>
+                        <span className="spec-value">
+                          {product.SizesOfProduct.width}
+                        </span>
+                      </div>
+                      <div className="spec-item">
+                        <span className="spec-label">{t("depth")}</span>
+                        <span className="spec-value">
+                          {product.SizesOfProduct.depth}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                  <div className="spec-item">
+                    <span className="spec-label">{t("materials")}</span>
+                    <span className="spec-value">
+                      {product?.material || "N/A"}
+                    </span>
+                  </div>
+                  <div className="spec-item">
+                    <span className="spec-label">{t("quantity")}</span>
+                    <span className="spec-value">
+                      {product?.quantity || "N/A"}
+                    </span>
+                  </div>
+                  <div className="spec-item">
+                    <span className="spec-label">{t("delivery")}</span>
+                    <span className="spec-value">
+                      {product?.delivery !== undefined
+                        ? product.delivery
+                          ? t("available")
+                          : t("notAvailable")
+                        : "N/A"}
+                    </span>
+                  </div>
                 </div>
-                <div className="spec-item">
-                  <span className="spec-label">{t("quantity")}</span>
-                  <span className="spec-value">
-                    {product?.quantity || "N/A"}
-                  </span>
-                </div>
-                <div className="spec-item">
-                  <span className="spec-label">{t("delivery")}</span>
-                  <span className="spec-value">
-                    {product?.delivery !== undefined
-                      ? product.delivery
-                        ? t("available")
-                        : t("notAvailable")
-                      : "N/A"}
-                  </span>
-                </div>
-              </div>
+              )}
             </div>
 
             <div className="ordering-info">
@@ -298,33 +316,39 @@ const ProductDetail = () => {
               <p className="ordering-text">
                 {t("orderingText", {
                   productName: isClient
-                    ? productNameKey || product?.title || t("loading")
-                    : t("loading"),
+                    ? productNameKey || product?.title || t("product")
+                    : t("product"),
                 })}
               </p>
-
               <button
-                className={`contact-shop-btn ${
-                  showContactInfo ? "active" : ""
-                }`}
+                className="contact-btn"
                 onClick={handleContactClick}
+                aria-expanded={showContactInfo}
               >
-                {showContactInfo
-                  ? t("hideContactInfo")
-                  : t("contactShopAssistant")}
+                {showContactInfo ? t("hideContact") : t("showContact")}
               </button>
-
               {showContactInfo && (
-                <div className="contact-details contact-animation">
+                <div className="contact-info">
                   <div className="contact-item">
-                    <span className="contact-label">{t("phone")}</span>
-                    <span className="contact-value">+998 95 083 21 27</span>
+                    <span className="contact-label">{t("phone")}:</span>
+                    <a href="tel:+998950832127" className="contact-value">
+                      +998950832127
+                    </a>
                   </div>
                   <div className="contact-item">
-                    <span className="contact-label">{t("email")}</span>
-                    <span className="contact-value">
+                    <span className="contact-label">{t("phone")}:</span>
+                    <a href="tel:+998998689349" className="contact-value">
+                      +998998689349
+                    </a>
+                  </div>
+                  <div className="contact-item">
+                    <span className="contact-label">{t("email")}:</span>
+                    <a
+                      href="mailto:dilmurodvccfx@gmail.com"
+                      className="contact-value"
+                    >
                       dilmurodvccfx@gmail.com
-                    </span>
+                    </a>
                   </div>
                 </div>
               )}
