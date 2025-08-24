@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { LuSunMedium, LuMoon } from "react-icons/lu";
@@ -179,13 +180,15 @@ const Header = () => {
   return (
     <header className="header">
       <Link href="/" className="logo">
-        <img
+        <Image
           src={favicon?.url ? getImageUrl(favicon.url) : "/icons/favicon.png"}
           alt={isClient ? siteName || "logo" : "logo"}
           width={120}
+          height={60}
           style={{
             opacity: siteInfoLoading ? 0.7 : 1,
             transition: "opacity 0.3s ease",
+            objectFit: "contain",
           }}
           suppressHydrationWarning
         />
@@ -225,7 +228,7 @@ const Header = () => {
                       handleSearchResultClick(product.documentId)
                     }
                   >
-                    <img
+                    <Image
                       src={
                         product?.img?.url
                           ? getImageUrl(product.img.url)
@@ -233,6 +236,9 @@ const Header = () => {
                       }
                       alt={product?.title || "Product"}
                       className="search-result-image"
+                      width={50}
+                      height={50}
+                      style={{ objectFit: "cover" }}
                     />
                     <div className="search-result-content">
                       <div className="search-result-name">

@@ -32,6 +32,7 @@ import EmptyState from "@/components/ui/EmptyState";
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
+import Image from "next/image";
 
 const PRODUCTS_PER_PAGE_GRID = 18;
 
@@ -122,35 +123,57 @@ const ProductCard = React.memo(
     layout: "grid" | "list";
   }) => {
     const router = useRouter();
+
+    if (layout === "grid") {
+      return (
+        <Link
+          href={`/product/${product.documentId}`}
+          className="collection-card"
+          prefetch={true}
+          onMouseEnter={() => {
+            router.prefetch(`/product/${product.documentId}`);
+          }}
+        >
+          <div className="card-image">
+            <Image
+              src={getImageUrl(product.img?.url)}
+              alt={product.title}
+              width={300}
+              height={200}
+              style={{ objectFit: "cover" }}
+            />
+          </div>
+          <div className="card-content">
+            <h3>{product.title}</h3>
+            <p className="product-price">{formatPriceNumber(product.price)}</p>
+          </div>
+        </Link>
+      );
+    }
+
+    // List layout - use unified product card style
     return (
       <Link
         href={`/product/${product.documentId}`}
-        className={`product-card category-product-card${
-          layout === "grid" ? " grid" : " list"
-        }`}
+        className="product-card list"
         prefetch={true}
         onMouseEnter={() => {
-          // Prefetch product data on hover
           router.prefetch(`/product/${product.documentId}`);
         }}
       >
-        <img
-          src={getImageUrl(product.img?.url)}
-          alt={product.title}
-          className={`category-product-img${
-            layout === "grid" ? " grid" : " list"
-          }`}
-        />
-        <div className="category-product-content">
-          <div className="category-product-name">{product.title}</div>
-          {layout === "list" && (
-            <div className="category-product-description">
-              {product.description}
-            </div>
-          )}
-          <div className="category-product-price">
-            {formatPriceNumber(product.price)}
-          </div>
+        <div className="card-image">
+          <Image
+            src={getImageUrl(product.img?.url)}
+            alt={product.title}
+            width={300}
+            height={200}
+            style={{ objectFit: "cover" }}
+          />
+        </div>
+        <div className="card-content">
+          <div className="card-title">{product.title}</div>
+          <div className="card-description">{product.description}</div>
+          <div className="card-price">{formatPriceNumber(product.price)}</div>
         </div>
       </Link>
     );
@@ -257,26 +280,35 @@ const Category = () => {
   }, [categorySlug, router]);
 
   const products = useMemo(() => {
+    // Agar hech qanday category tanlanmagan bo'lsa, barcha productlarni qaytar
+    if (selectedCategories.length === 0) {
+      return allProducts;
+    }
+
+    // Agar bir nechta category tanlangan bo'lsa, multiple categories API dan olish
     if (selectedCategories.length > 1) {
       const multipleCategoriesProducts =
         productsByMultipleCategoriesData?.data || [];
       return multipleCategoriesProducts;
     }
 
-    if (
-      categorySlug &&
-      productsByCategory.length > 0 &&
-      selectedCategories.length === 1
-    ) {
-      return productsByCategory;
-    }
-
+    // Agar faqat bitta category tanlangan bo'lsa
     if (selectedCategories.length === 1) {
-      const filtered = allProducts.filter((product: ProductForCard) => {
-        const materialMatch = product.material === selectedCategories[0];
-        return materialMatch;
-      });
-      return filtered;
+      // Avval categorySlug orqali kelgan productlarni tekshir
+      if (categorySlug && productsByCategory.length > 0) {
+        return productsByCategory;
+      }
+
+      // Agar categorySlug orqali productlar topilmasa, selectedCategoryIds orqali olish
+      // Lekin faqat bitta category bo'lgani uchun, uni to'g'ridan-to'g'ri ishlatamiz
+      if (selectedCategoryIds.length === 1) {
+        const singleCategoryProducts =
+          productsByMultipleCategoriesData?.data || [];
+        return singleCategoryProducts;
+      }
+
+      // Agar hech qanday usul bilan productlar topilmasa, barcha productlarni qaytar
+      return allProducts;
     }
 
     return allProducts;
@@ -284,6 +316,7 @@ const Category = () => {
     categorySlug,
     productsByCategory,
     selectedCategories,
+    selectedCategoryIds,
     productsByMultipleCategoriesData,
     allProducts,
   ]);
@@ -441,7 +474,9 @@ const Category = () => {
           <div className="category-filter-btns">
             <button
               onClick={() => handleCategoryClick(t("allCategories"))}
-              className="category-btn category-btn-all"
+              className={`category-btn category-btn-all${
+                selectedCategories.length === 0 ? " category-btn-active" : ""
+              }`}
             >
               {t("allCategories")}
             </button>
@@ -517,20 +552,32 @@ const Category = () => {
           </div>
         </div>
         <div
-          className={
-            layout === "grid"
-              ? "products-grid category-products-grid"
-              : "products-list category-products-list"
-          }
+          className={layout === "grid" ? "collections-grid" : "products-list"}
         >
           {categoriesLoading ? (
-            <SkeletonGrid count={3} type="product" layout={layout} />
+            <SkeletonGrid
+              count={layout === "grid" ? 12 : 6}
+              type={layout === "grid" ? "collection" : "product"}
+              layout={layout}
+            />
           ) : allProductsLoading && selectedCategories.length === 0 ? (
-            <SkeletonGrid count={3} type="product" layout={layout} />
+            <SkeletonGrid
+              count={layout === "grid" ? 12 : 6}
+              type={layout === "grid" ? "collection" : "product"}
+              layout={layout}
+            />
           ) : categoryProductsLoading && categorySlug ? (
-            <SkeletonGrid count={3} type="product" layout={layout} />
+            <SkeletonGrid
+              count={layout === "grid" ? 12 : 6}
+              type={layout === "grid" ? "collection" : "product"}
+              layout={layout}
+            />
           ) : multipleCategoriesLoading && selectedCategories.length > 1 ? (
-            <SkeletonGrid count={3} type="product" layout={layout} />
+            <SkeletonGrid
+              count={layout === "grid" ? 12 : 6}
+              type={layout === "grid" ? "collection" : "product"}
+              layout={layout}
+            />
           ) : paginatedProducts.length === 0 ? (
             <div
               style={{

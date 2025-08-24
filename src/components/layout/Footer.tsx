@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
+import Image from "next/image";
 import { useCategoryStore } from "@/app/category/store";
 import { useGetCategories } from "@/hooks/getCategories";
 import { FaPhone } from "react-icons/fa6";
@@ -29,12 +30,14 @@ const Footer = () => {
       <div className="footer__main">
         <div className="column">
           <Link href="/" className="footer__brand">
-            <img
+            <Image
               src={
                 favicon?.url ? getImageUrl(favicon.url) : "/icons/favicon.png"
               }
               alt={siteName || "logo"}
               width={60}
+              height={60}
+              style={{ objectFit: "contain" }}
             />
             <span suppressHydrationWarning>{siteName || t("logo")}</span>
           </Link>
@@ -46,11 +49,12 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 aria-label="Instagram"
               >
-                <img
+                <Image
                   src="/icons/instagram.webp"
                   width={20}
                   height={20}
                   alt="instagram"
+                  style={{ objectFit: "contain" }}
                 />
               </a>
             )}
@@ -61,11 +65,12 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 aria-label="Telegram"
               >
-                <img
+                <Image
                   src="/icons/telegram.webp"
                   width={20}
                   height={20}
                   alt="telegram"
+                  style={{ objectFit: "contain" }}
                 />
               </a>
             )}
@@ -76,7 +81,13 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 aria-label="YouTube"
               >
-                <img src="/icons/youtube.png" height={20} alt="youtube" />
+                <Image
+                  src="/icons/youtube.png"
+                  width={20}
+                  height={20}
+                  alt="youtube"
+                  style={{ objectFit: "contain" }}
+                />
               </a>
             )}
           </div>
@@ -99,12 +110,12 @@ const Footer = () => {
                     gap: "0.5rem",
                   }}
                 >
-                  <img
+                  <Image
                     width={20}
                     height={20}
                     src="/icons/gmail.png"
                     alt="gmail"
-                    style={{ display: "inline-block" }}
+                    style={{ display: "inline-block", objectFit: "contain" }}
                   />
                   <span style={{ color: "var(--text-tertiary)", fontSize: 16 }}>
                     {socialMedia.Email}

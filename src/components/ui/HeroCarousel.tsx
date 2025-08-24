@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { getImageUrl } from "@/utils/formatPrice";
 
 interface HeroImage {
@@ -106,13 +107,17 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({
               transform: `translateX(${(index - currentIndex) * 100}%)`,
             }}
           >
-            <img
+            <Image
               src={getImageUrl(image.url)}
               alt={image.name || `Hero Image ${index + 1}`}
               className="hero-carousel-image"
+              width={1200}
+              height={600}
+              style={{ objectFit: "cover" }}
               onError={(e) => {
                 e.currentTarget.src = "/img/cardimg.png";
               }}
+              priority={index === 0}
             />
           </div>
         ))}

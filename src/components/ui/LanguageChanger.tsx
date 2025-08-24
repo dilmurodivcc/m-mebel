@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { GrLanguage } from "react-icons/gr";
 import { useTranslation } from "react-i18next";
 import { useThemeStore } from "../../app/theme/store";
@@ -85,7 +86,7 @@ const LanguageChanger = ({ className = "" }) => {
                 onClick={() => handleLanguageChange(language.code)}
                 className={i18n.language === language.code ? "active" : ""}
               >
-                <img
+                <Image
                   width={18}
                   height={18}
                   style={{ borderRadius: "50%" }}

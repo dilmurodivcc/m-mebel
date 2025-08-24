@@ -4,6 +4,7 @@ import ClientLayout from "@/components/layout/ClientLayout";
 import React, { useState, useCallback, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { LuSunMedium, LuMoon } from "react-icons/lu";
 import { useThemeStore } from "@/app/theme/store";
@@ -93,11 +94,22 @@ const ProductDetail = () => {
     }
   }, [productImages.length, selectedImage]);
 
-  const productNameKey = product?.title;
-  const productDescriptionKey = product?.description;
+  const productNameKey = product?.title || "";
+  const productDescriptionKey = product?.description || "";
 
   const handleContactClick = useCallback(() => {
-    setShowContactInfo(!showContactInfo);
+    const newShowContactInfo = !showContactInfo;
+    setShowContactInfo(newShowContactInfo);
+
+    // Scroll down 200px when showing contact info
+    if (newShowContactInfo) {
+      setTimeout(() => {
+        window.scrollBy({
+          top: 150,
+          behavior: "smooth",
+        });
+      }, 100); // Small delay to ensure the contact info is rendered
+    }
   }, [showContactInfo]);
 
   // Show error state if there are critical errors
@@ -132,14 +144,11 @@ const ProductDetail = () => {
     <ClientLayout showHeader={false} showFooter={false}>
       <main className="product-detail-page">
         <div className="actions">
-          <button
-            className="back-btn"
-            onClick={() => router.back()}
-            aria-label={t("goBack")}
-          >
+          <Link href="/category" aria-label={t("goBack")} className="back-btn">
             <MdKeyboardArrowLeft size={24} />
             {t("backButton")}
-          </button>
+          </Link>
+
           <div
             className="left_actions"
             style={{ display: "flex", alignItems: "center", gap: "10px" }}
@@ -169,10 +178,8 @@ const ProductDetail = () => {
             {product?.material || ""}
           </Link>{" "}
           /{" "}
-          <span className="breadcrumb-current" suppressHydrationWarning>
-            {isClient
-              ? productNameKey || product?.title || t("loading")
-              : t("loading")}
+          <span className="breadcrumb-current">
+            {isClient && productNameKey ? productNameKey : t("loading")}
           </span>
         </nav>
 
@@ -182,7 +189,7 @@ const ProductDetail = () => {
               {loading ? (
                 <div className="product-main-img-skeleton" />
               ) : (
-                <img
+                <Image
                   src={
                     (productImages.length > 0 &&
                       productImages[selectedImage]) ||
@@ -191,10 +198,13 @@ const ProductDetail = () => {
                   }
                   alt={product?.title || t("product")}
                   className="product-main-img"
+                  width={600}
+                  height={400}
+                  style={{ objectFit: "cover" }}
                   onError={(e) => {
                     e.currentTarget.src = "/img/cardimg.png";
                   }}
-                  loading="eager"
+                  priority
                 />
               )}
             </div>
@@ -205,7 +215,7 @@ const ProductDetail = () => {
                   ))
                 : productImages.length > 0 &&
                   productImages.map((img, idx) => (
-                    <img
+                    <Image
                       key={idx}
                       src={img}
                       alt={`${product?.title || t("product")} ${idx + 1}`}
@@ -213,23 +223,25 @@ const ProductDetail = () => {
                         selectedImage === idx ? " active" : ""
                       }`}
                       onClick={() => setSelectedImage(idx)}
+                      width={100}
+                      height={100}
+                      style={{ objectFit: "cover" }}
                       onError={(e) => {
                         e.currentTarget.src = "/img/cardimg.png";
                       }}
-                      loading="lazy"
                     />
                   ))}
             </div>
           </div>
 
           <div className="product-info">
-            <h1 className="product-title" suppressHydrationWarning>
+            <h1 className="product-title">
               {loading ? (
                 <div className="product-title-skeleton" />
-              ) : isClient ? (
-                productNameKey || product?.title || t("loading")
+              ) : isClient && productNameKey ? (
+                productNameKey
               ) : (
-                t("loading")
+                <div className="product-title-skeleton" />
               )}
             </h1>
             <div className="product-price">
@@ -247,12 +259,12 @@ const ProductDetail = () => {
               {loading ? (
                 <div className="product-description-skeleton" />
               ) : (
-                <p suppressHydrationWarning>
-                  {isClient
-                    ? productDescriptionKey ||
-                      product?.description ||
-                      t("loading")
-                    : t("loading")}
+                <p>
+                  {isClient && productDescriptionKey ? (
+                    productDescriptionKey
+                  ) : (
+                    <div className="product-description-skeleton" />
+                  )}
                 </p>
               )}
             </div>
@@ -315,12 +327,12 @@ const ProductDetail = () => {
               <h3>{t("orderingInfo")}</h3>
               <p className="ordering-text">
                 {t("orderingText", {
-                  productName: isClient
-                    ? productNameKey || product?.title || t("product")
-                    : t("product"),
+                  productName:
+                    isClient && productNameKey ? productNameKey : t("product"),
                 })}
               </p>
               <button
+                key={`contact-btn-${isClient ? "client" : "server"}`}
                 className="contact-btn"
                 onClick={handleContactClick}
                 aria-expanded={showContactInfo}

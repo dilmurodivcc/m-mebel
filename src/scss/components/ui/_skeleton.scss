@@ -391,7 +391,6 @@
       gap: 12px;
       width: 90vw !important;
     }
-
   }
 
   &.list {
@@ -400,34 +399,14 @@
   }
 }
 
-.category-page .skeleton-grid.grid {
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  width: 400px !important;
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 16px;
-  }
+// Category page skeleton should inherit from parent grid containers
+// Remove specific overrides to let collections-grid and products-list handle layout
+.collections-grid .skeleton-grid {
+  display: contents; // Let skeleton cards inherit parent grid layout
 }
 
-.category-products-grid .skeleton-grid {
-  display: grid !important;
-  grid-template-columns: repeat(4, 1fr) !important;
-  gap: 16px !important;
-  width: 90vw !important;
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
-    gap: 16px !important;
-  }
-}
-
-.category-products-list .skeleton-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-  width: 100%;
+.products-list .skeleton-grid {
+  display: contents; // Let skeleton cards inherit parent list layout
 }
 
 .skeleton-loading {

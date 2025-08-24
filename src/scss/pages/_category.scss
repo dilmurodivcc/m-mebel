@@ -71,10 +71,12 @@
   background: var(--bg-secondary);
   color: var(--text);
   line-height: 1;
+  padding: 8px 16px;
 }
 .category-btn-all.category-btn-active {
   background: var(--bg-tertiary);
   color: var(--text-secondary);
+
 }
 .category-price-filter {
   display: flex;

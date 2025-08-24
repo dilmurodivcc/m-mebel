@@ -146,7 +146,7 @@ export const useGetProducts = () => {
             API.get("/api/products?populate[0]=img&populate[1]=detail_img", {
               signal: controller.signal,
             }).then((r) => r),
-          2 * 60 * 1000 
+          2 * 60 * 1000
         );
 
         if (!isMounted) return;
@@ -336,7 +336,9 @@ export const useGetProductsByCategorySlug = (categorySlug: string) => {
       try {
         setLoading(true);
         setError(null);
-        const url = `/api/products?filters[category][slug][$eq]=${categorySlug}&populate[0]=img&populate[1]=detail_img`;
+        // Use the correct Strapi API format for filtering by category slug
+        const encodedSlug = encodeURIComponent(categorySlug);
+        const url = `/api/products?filters[category][slug][$eq]=${encodedSlug}&populate[0]=img&populate[1]=detail_img`;
         const response = await fetchWithCache(
           `products-by-category:${categorySlug}`,
           () => API.get(url, { signal: controller.signal }).then((r) => r),

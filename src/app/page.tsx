@@ -5,6 +5,7 @@ import ClientLayout from "../components/layout/ClientLayout";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useGetProducts } from "@/hooks/getProducts";
 import { useGetCategories } from "@/hooks/getCategories";
 import { useGetSiteInfo } from "@/hooks/getGlobals";
@@ -179,9 +180,12 @@ export default function Home() {
                     prefetch={true}
                   >
                     <div className="card-image">
-                      <img
+                      <Image
                         src={getImageUrl(product.img?.url)}
                         alt={product.title}
+                        width={300}
+                        height={200}
+                        style={{ objectFit: "cover" }}
                         onError={(e) => {
                           e.currentTarget.src = "/img/cardimg.png";
                         }}
@@ -217,9 +221,12 @@ export default function Home() {
                     onClick={handleProductClick}
                   >
                     <div className="category-image">
-                      <img
+                      <Image
                         src={getImageUrl(category.image?.url)}
                         alt={category.name}
+                        width={300}
+                        height={200}
+                        style={{ objectFit: "cover" }}
                         onError={(e) => {
                           e.currentTarget.src = "/img/cardimg.png";
                         }}
@@ -249,9 +256,12 @@ export default function Home() {
                     prefetch={true}
                   >
                     <div className="card-image">
-                      <img
+                      <Image
                         src={getImageUrl(product.img?.url)}
                         alt={product.title}
+                        width={300}
+                        height={200}
+                        style={{ objectFit: "cover" }}
                         onError={(e) => {
                           e.currentTarget.src = "/img/cardimg.png";
                         }}
