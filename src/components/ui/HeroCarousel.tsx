@@ -114,9 +114,6 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({
               width={1200}
               height={600}
               style={{ objectFit: "cover" }}
-              onError={(e) => {
-                e.currentTarget.src = "/img/cardimg.png";
-              }}
               priority={index === 0}
             />
           </div>

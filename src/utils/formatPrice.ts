@@ -21,15 +21,28 @@ export const getImageUrl = (
   imageUrl: string | undefined,
   baseUrl: string = process.env.NEXT_PUBLIC_API_URL || "https://exuberant-comfort-0c2f94bc2b.strapiapp.com"
 ): string => {
-  if (!imageUrl) {
+  if (!imageUrl || imageUrl.trim() === '') {
     return "/img/cardimg.png"; 
   }
   
-  if (imageUrl.startsWith('http')) {
+  // If it's already a full URL, return as is
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
     return imageUrl;
   }
   
-  return `${baseUrl}${imageUrl}`;
+  // If it's a relative path starting with /, return as is (for local images)
+  if (imageUrl.startsWith('/')) {
+    return imageUrl;
+  }
+  
+  // If it's a data URL, return as is
+  if (imageUrl.startsWith('data:')) {
+    return imageUrl;
+  }
+  
+  // Otherwise, prepend the base URL
+  const cleanImageUrl = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+  return `${baseUrl}${cleanImageUrl}`;
 };
 
 export const formatPriceShort = (price: number): string => {

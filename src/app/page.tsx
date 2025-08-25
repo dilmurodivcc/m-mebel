@@ -13,6 +13,7 @@ import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
 import { SkeletonGrid } from "@/components/ui/SkeletonLoader";
 import ErrorState from "@/components/ui/ErrorState";
 import HeroCarousel from "@/components/ui/HeroCarousel";
+import SafeImage from "@/components/ui/SafeImage";
 
 declare global {
   interface Window {
@@ -180,15 +181,12 @@ export default function Home() {
                     prefetch={true}
                   >
                     <div className="card-image">
-                      <Image
+                      <SafeImage
                         src={getImageUrl(product.img?.url)}
                         alt={product.title}
                         width={300}
                         height={200}
                         style={{ objectFit: "cover" }}
-                        onError={(e) => {
-                          e.currentTarget.src = "/img/cardimg.png";
-                        }}
                       />
                     </div>
                     <div className="card-content">
@@ -221,15 +219,12 @@ export default function Home() {
                     onClick={handleProductClick}
                   >
                     <div className="category-image">
-                      <Image
+                      <SafeImage
                         src={getImageUrl(category.image?.url)}
                         alt={category.name}
                         width={300}
                         height={200}
                         style={{ objectFit: "cover" }}
-                        onError={(e) => {
-                          e.currentTarget.src = "/img/cardimg.png";
-                        }}
                       />
                     </div>
                     <h3 suppressHydrationWarning>{category.name}</h3>
@@ -256,15 +251,12 @@ export default function Home() {
                     prefetch={true}
                   >
                     <div className="card-image">
-                      <Image
+                      <SafeImage
                         src={getImageUrl(product.img?.url)}
                         alt={product.title}
                         width={300}
                         height={200}
                         style={{ objectFit: "cover" }}
-                        onError={(e) => {
-                          e.currentTarget.src = "/img/cardimg.png";
-                        }}
                       />
                     </div>
                     <div className="card-content">

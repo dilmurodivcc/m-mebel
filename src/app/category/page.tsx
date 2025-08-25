@@ -28,6 +28,7 @@ import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
 import { SkeletonGrid } from "@/components/ui/SkeletonLoader";
 import ErrorState from "@/components/ui/ErrorState";
 import EmptyState from "@/components/ui/EmptyState";
+import SafeImage from "@/components/ui/SafeImage";
 
 export const dynamic = "force-dynamic";
 
@@ -135,7 +136,7 @@ const ProductCard = React.memo(
           }}
         >
           <div className="card-image">
-            <Image
+            <SafeImage
               src={getImageUrl(product.img?.url)}
               alt={product.title}
               width={300}
@@ -162,7 +163,7 @@ const ProductCard = React.memo(
         }}
       >
         <div className="card-image">
-          <Image
+          <SafeImage
             src={getImageUrl(product.img?.url)}
             alt={product.title}
             width={300}

@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import LanguageChanger from "@/components/ui/LanguageChanger";
 import { useGetProduct } from "@/hooks/getProducts";
 import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
+import SafeImage from "@/components/ui/SafeImage";
 
 import ErrorState from "@/components/ui/ErrorState";
 
@@ -189,7 +190,7 @@ const ProductDetail = () => {
               {loading ? (
                 <div className="product-main-img-skeleton" />
               ) : (
-                <Image
+                <SafeImage
                   src={
                     (productImages.length > 0 &&
                       productImages[selectedImage]) ||
@@ -201,9 +202,6 @@ const ProductDetail = () => {
                   width={600}
                   height={400}
                   style={{ objectFit: "cover" }}
-                  onError={(e) => {
-                    e.currentTarget.src = "/img/cardimg.png";
-                  }}
                   priority
                 />
               )}
@@ -215,7 +213,7 @@ const ProductDetail = () => {
                   ))
                 : productImages.length > 0 &&
                   productImages.map((img, idx) => (
-                    <Image
+                    <SafeImage
                       key={idx}
                       src={img}
                       alt={`${product?.title || t("product")} ${idx + 1}`}
@@ -226,9 +224,6 @@ const ProductDetail = () => {
                       width={100}
                       height={100}
                       style={{ objectFit: "cover" }}
-                      onError={(e) => {
-                        e.currentTarget.src = "/img/cardimg.png";
-                      }}
                     />
                   ))}
             </div>

@@ -181,7 +181,11 @@ const Header = () => {
     <header className="header">
       <Link href="/" className="logo">
         <Image
-          src={favicon?.url ? getImageUrl(favicon.url) : "/icons/favicon.png"}
+          src={
+            favicon?.url && favicon.url.trim()
+              ? getImageUrl(favicon.url)
+              : "/icons/favicon.png"
+          }
           alt={isClient ? siteName || "logo" : "logo"}
           width={120}
           height={60}
@@ -230,7 +234,7 @@ const Header = () => {
                   >
                     <Image
                       src={
-                        product?.img?.url
+                        product?.img?.url && product.img.url.trim()
                           ? getImageUrl(product.img.url)
                           : "/img/cardimg.png"
                       }
