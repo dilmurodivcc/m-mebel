@@ -5,7 +5,6 @@ import ClientLayout from "../components/layout/ClientLayout";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { useGetProducts } from "@/hooks/getProducts";
 import { useGetCategories } from "@/hooks/getCategories";
 import { useGetSiteInfo } from "@/hooks/getGlobals";

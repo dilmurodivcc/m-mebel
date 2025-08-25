@@ -33,7 +33,6 @@ import SafeImage from "@/components/ui/SafeImage";
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import Image from "next/image";
 
 const PRODUCTS_PER_PAGE_GRID = 18;
 

@@ -4,7 +4,6 @@ import ClientLayout from "@/components/layout/ClientLayout";
 import React, { useState, useCallback, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { LuSunMedium, LuMoon } from "react-icons/lu";
 import { useThemeStore } from "@/app/theme/store";
@@ -13,7 +12,6 @@ import LanguageChanger from "@/components/ui/LanguageChanger";
 import { useGetProduct } from "@/hooks/getProducts";
 import { formatPriceNumber, getImageUrl } from "@/utils/formatPrice";
 import SafeImage from "@/components/ui/SafeImage";
-
 import ErrorState from "@/components/ui/ErrorState";
 
 export const dynamic = "force-dynamic";
